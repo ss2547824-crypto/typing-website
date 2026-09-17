@@ -4,1495 +4,1678 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>TypeFlow — Typing Speed Test</title>
+<meta name="description" content="TypeFlow — a calm, 3D animated typing speed test with English & Hindi keyboards, live scoreboard and 1/2/3/5/8/10 minute challenges." />
 
-<!-- ==========================================================
-     GOOGLE ADSENSE — paste your script here when approved
-     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXX" crossorigin="anonymous"></script>
-     ========================================================== -->
+<!-- ============================================================
+     GOOGLE ADSENSE  (paste your script here)
+     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXX" crossorigin="anonymous"><\/script>
+     ============================================================ -->
 
 <style>
 /* ============================================================
-   1. DESIGN TOKENS — dull, soft, Fluent / Cupertino 3D surface
+   1. DESIGN TOKENS  —  "dull 3D" neumorphic palette
    ============================================================ */
 :root{
-  --bg1:#eef1f7;
-  --bg2:#e4e9f2;
-  --bg3:#dbe1ec;
+  --bg-1:#e9edf4;
+  --bg-2:#e2e8f1;
+  --bg-3:#dde4ef;
 
-  --ink:#2c3546;
-  --ink2:#5d6979;
-  --ink3:#8d99ac;
-  --ink4:#aab4c4;
+  --panel-a:#f3f7fc;
+  --panel-b:#e4eaf3;
 
-  --accent:#5b7cfa;
-  --accent2:#8098ff;
-  --accent-soft:rgba(91,124,250,.14);
+  --txt:#4a5568;
+  --txt-soft:#8c97ab;
+  --txt-dim:#a7b0c0;
 
-  --good:#37a07a;
-  --bad:#d1665f;
+  --acc:#7b8cb8;
+  --acc-2:#a294bd;
+  --acc-3:#8fae9f;
 
-  --line:rgba(150,168,196,.28);
+  --ok:#5f8f74;
+  --ok-bg:rgba(120,175,145,.18);
+  --bad:#b87878;
+  --bad-bg:rgba(200,130,130,.18);
 
-  --raise:
-     inset 0 1px 0 rgba(255,255,255,.95),
-     inset 0 -1px 0 rgba(160,175,200,.18),
-     0 10px 26px rgba(140,157,185,.18),
-     0 2px 6px rgba(140,157,185,.12);
+  --sh-d:#c2cad7;
+  --sh-l:#ffffff;
 
-  --soft:
-     inset 0 1px 0 rgba(255,255,255,.9),
-     0 4px 14px rgba(140,157,185,.14);
+  --r-lg:22px;
+  --r-md:16px;
+  --r-sm:11px;
 
-  --press:
-     inset 0 2px 4px rgba(140,157,185,.28),
-     inset 0 1px 0 rgba(255,255,255,.5),
-     0 1px 2px rgba(140,157,185,.16);
-
-  --r-xl:28px;
-  --r-lg:20px;
-  --r-md:14px;
-  --r-sm:10px;
-
-  --ease:cubic-bezier(.4,0,.2,1);
-  --bounce:cubic-bezier(.34,1.5,.64,1);
-
-  --lh:46px;              /* typing line height */
-  --caret-h:26px;
-}
-
-*{margin:0;padding:0;box-sizing:border-box;}
-
-html,body{height:100%;}
-
-body{
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI Variable Display",
-              "Segoe UI",Inter,Roboto,"Helvetica Neue",Arial,sans-serif;
-  color:var(--ink);
-  background:
-     radial-gradient(1200px 700px at 10% -12%, #f7f9fd 0%, transparent 60%),
-     radial-gradient(900px 620px at 104% 8%, #e9eefb 0%, transparent 55%),
-     linear-gradient(168deg,var(--bg1) 0%,var(--bg2) 55%,var(--bg3) 100%);
-  background-attachment:fixed;
-  min-height:100%;
-  overflow-x:hidden;
-  position:relative;
-  -webkit-font-smoothing:antialiased;
-  text-rendering:optimizeLegibility;
+  --ease:cubic-bezier(.34,1.4,.5,1);
 }
 
 /* ============================================================
-   2. AMBIENT BACKGROUND — floating keywords + soft orbs
+   2. BASE
    ============================================================ */
-.float-layer{
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,
+              "Helvetica Neue","Noto Sans","Noto Sans Devanagari",Arial,sans-serif;
+  color:var(--txt);
+  min-height:100vh;
+  overflow-x:hidden;
+  position:relative;
+  background:
+    radial-gradient(1200px 620px at 8% -12%, #f8fbff 0%, rgba(248,251,255,0) 62%),
+    radial-gradient(1000px 520px at 102% -6%, #f4f0fb 0%, rgba(244,240,251,0) 58%),
+    radial-gradient(900px 700px at 50% 120%, #e6f0ec 0%, rgba(230,240,236,0) 60%),
+    linear-gradient(165deg,var(--bg-1) 0%,var(--bg-2) 48%,var(--bg-3) 100%);
+  background-attachment:fixed;
+  perspective:1500px;
+}
+
+/* soft film-grain / vignette for the "dull" matte feel */
+body::after{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:1;
+  background:radial-gradient(120% 90% at 50% 40%, rgba(255,255,255,0) 55%, rgba(120,132,155,.13) 100%);
+  mix-blend-mode:multiply;
+}
+
+::selection{background:rgba(123,140,184,.28);}
+
+/* ============================================================
+   3. FLOATING BACKGROUND KEYWORDS  (light mode)
+   ============================================================ */
+#bgLayer{
   position:fixed;
   inset:0;
   z-index:0;
   overflow:hidden;
   pointer-events:none;
+  transition:opacity .5s ease, filter .5s ease;
 }
-
-.orb{
+.bg-word{
   position:absolute;
-  border-radius:50%;
-  filter:blur(52px);
-  opacity:.55;
-  will-change:transform;
-  animation:orbDrift ease-in-out infinite alternate;
-}
-@keyframes orbDrift{
-  from{ transform:translate3d(0,0,0) scale(1); }
-  to  { transform:translate3d(48px,-56px,0) scale(1.16); }
-}
-
-.float-word{
-  position:absolute;
-  font-weight:700;
-  letter-spacing:-.02em;
-  color:rgba(108,132,178,.13);
+  font-weight:800;
+  letter-spacing:.03em;
+  color:#93a1b8;
+  opacity:.15;
   white-space:nowrap;
   user-select:none;
-  will-change:transform,opacity;
-  animation:floatUp linear infinite;
+  filter:blur(.35px);
+  text-shadow:0 1px 0 rgba(255,255,255,.9), 0 6px 14px rgba(180,190,210,.35);
+  animation-name:drift;
+  animation-timing-function:ease-in-out;
+  animation-iteration-count:infinite;
+  will-change:transform;
+  transform:translateZ(0);
 }
-@keyframes floatUp{
-  0%   { transform:translate3d(0,32px,0) rotate(var(--rot,0deg)) scale(.95); opacity:0; }
-  12%  { opacity:1; }
-  86%  { opacity:1; }
-  100% { transform:translate3d(var(--drift,0px),-170px,0) rotate(var(--rot,0deg)) scale(1.03); opacity:0; }
+@keyframes drift{
+  0%  {transform:translate3d(0,0,0) rotate(var(--rot));}
+  25% {transform:translate3d(24px,-30px,0) rotate(calc(var(--rot) + 3deg));}
+  50% {transform:translate3d(-20px,-58px,0) rotate(calc(var(--rot) - 4deg));}
+  75% {transform:translate3d(28px,-26px,0) rotate(calc(var(--rot) + 2deg));}
+  100%{transform:translate3d(0,0,0) rotate(var(--rot));}
 }
 
-/* ---- FREEZE THE AMBIENCE WHILE TYPING ---- */
-body.typing .float-word,
-body.typing .orb{
-  animation-play-state:paused !important;
+/* >>> When the user types, background features FREEZE <<< */
+body.typing #bgLayer{opacity:.55;filter:blur(1.6px) saturate(.7);}
+body.typing .bg-word{animation-play-state:paused;}
+
+/* ============================================================
+   4. PAGE LAYOUT
+   ============================================================ */
+.page{
+  position:relative;
+  z-index:2;
+  max-width:1120px;
+  margin:0 auto;
+  padding:34px 18px 70px;
+  display:flex;
+  flex-direction:column;
+  gap:22px;
+}
+
+/* ---------- HERO ---------- */
+.hero{text-align:center;padding:14px 8px 4px;}
+.hero h1{
+  font-size:clamp(2.1rem,5.4vw,3.35rem);
+  font-weight:800;
+  letter-spacing:-.028em;
+  background:linear-gradient(160deg,#64749b 0%,#8a7fae 45%,#6f9b8b 100%);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  text-shadow:
+     0 1px 0 rgba(255,255,255,.85),
+     0 8px 20px rgba(140,152,180,.32);
+  animation:heroIn .9s var(--ease) both;
+}
+.hero p{
+  margin-top:8px;
+  font-size:clamp(.86rem,1.9vw,1rem);
+  color:var(--txt-soft);
+  letter-spacing:.05em;
+  text-transform:uppercase;
+  font-weight:600;
+  animation:heroIn .9s .1s var(--ease) both;
+}
+@keyframes heroIn{
+  from{opacity:0;transform:translateY(-14px) rotateX(24deg);}
+  to{opacity:1;transform:none;}
+}
+
+/* ---------- PANEL BASE ---------- */
+.panel{
+  position:relative;
+  background:linear-gradient(148deg,var(--panel-a) 0%,var(--panel-b) 100%);
+  border-radius:var(--r-lg);
+  border:1px solid rgba(255,255,255,.72);
+  box-shadow:
+     12px 12px 28px var(--sh-d),
+    -12px -12px 28px var(--sh-l),
+     inset 0 1px 0 rgba(255,255,255,.9);
+  padding:20px 22px;
+  transform-style:preserve-3d;
+  transition:transform .45s var(--ease), box-shadow .45s var(--ease);
+  animation:panelIn .8s var(--ease) both;
+}
+@keyframes panelIn{
+  from{opacity:0;transform:translateY(22px) rotateX(9deg);}
+  to{opacity:1;transform:none;}
+}
+.panel:hover{
+  transform:translateY(-3px) rotateX(.7deg);
+  box-shadow:
+     16px 18px 36px var(--sh-d),
+    -14px -14px 32px var(--sh-l),
+     inset 0 1px 0 rgba(255,255,255,.95);
+}
+
+.panel-title{
+  font-size:.72rem;
+  font-weight:800;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:var(--txt-dim);
+  margin-bottom:14px;
+  display:flex;
+  align-items:center;
+  gap:9px;
+}
+.panel-title::before{
+  content:"";
+  width:7px;height:7px;border-radius:50%;
+  background:linear-gradient(140deg,var(--acc),var(--acc-2));
+  box-shadow:0 0 0 3px rgba(123,140,184,.16);
+}
+
+/* ---------- AD SLOTS ---------- */
+.ad-slot{
+  position:relative;
+  border-radius:var(--r-md);
+  border:1.5px dashed rgba(150,162,184,.45);
+  background:linear-gradient(150deg,rgba(255,255,255,.55),rgba(228,234,243,.55));
+  box-shadow:inset 4px 4px 12px rgba(194,202,215,.45),
+             inset -4px -4px 12px rgba(255,255,255,.85);
+  min-height:92px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  gap:5px;
+  color:var(--txt-dim);
+  font-size:.72rem;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  font-weight:700;
+  overflow:hidden;
+}
+.ad-slot span.small{font-size:.62rem;letter-spacing:.08em;text-transform:none;font-weight:500;opacity:.8;}
+.ad-slot::before{
+  content:"";
+  position:absolute;inset:0;
+  background:linear-gradient(105deg,transparent 40%,rgba(255,255,255,.7) 50%,transparent 60%);
+  transform:translateX(-100%);
+  animation:adShine 5.5s ease-in-out infinite;
+}
+@keyframes adShine{0%,70%{transform:translateX(-100%);}100%{transform:translateX(100%);}}
+
+/* ============================================================
+   5. CONTROLS
+   ============================================================ */
+.controls-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:18px;
+  align-items:center;
+  justify-content:space-between;
+}
+.control-group{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.control-label{
+  font-size:.68rem;
+  font-weight:800;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--txt-dim);
+}
+
+.time-btns{display:flex;gap:9px;flex-wrap:wrap;}
+.tbtn{
+  font:inherit;
+  font-size:.86rem;
+  font-weight:700;
+  color:var(--txt-soft);
+  border:1px solid rgba(255,255,255,.75);
+  background:linear-gradient(150deg,#f6f9fd,#e4eaf3);
+  border-radius:13px;
+  padding:10px 17px;
+  cursor:pointer;
+  box-shadow:5px 5px 12px var(--sh-d), -5px -5px 12px var(--sh-l);
+  transition:transform .22s var(--ease), box-shadow .22s var(--ease), color .22s;
+  transform-style:preserve-3d;
+}
+.tbtn:hover{transform:translateY(-2px);color:var(--acc);}
+.tbtn:active{transform:translateY(1px);}
+.tbtn.active{
+  color:#fff;
+  background:linear-gradient(150deg,#8c9cc6,#7688b5);
+  box-shadow:
+     inset 4px 4px 10px rgba(70,84,120,.5),
+     inset -3px -3px 8px rgba(190,205,235,.35),
+     0 6px 16px rgba(118,136,181,.4);
+  transform:translateY(1px);
+}
+
+.lang-toggle{
+  display:flex;
+  background:linear-gradient(150deg,#e6ebf3,#f4f8fd);
+  border-radius:13px;
+  padding:5px;
+  box-shadow:inset 4px 4px 10px var(--sh-d), inset -4px -4px 10px var(--sh-l);
+  gap:4px;
+}
+.lang-toggle button{
+  font:inherit;font-size:.82rem;font-weight:700;
+  border:none;background:transparent;color:var(--txt-soft);
+  padding:8px 16px;border-radius:9px;cursor:pointer;
+  transition:all .28s var(--ease);
+}
+.lang-toggle button.active{
+  background:linear-gradient(150deg,#f8fbff,#e2e9f3);
+  color:var(--acc);
+  box-shadow:3px 3px 8px var(--sh-d), -3px -3px 8px var(--sh-l);
+}
+
+.btn{
+  font:inherit;font-size:.85rem;font-weight:700;
+  border:1px solid rgba(255,255,255,.75);
+  background:linear-gradient(150deg,#f6f9fd,#e4eaf3);
+  color:var(--txt-soft);
+  border-radius:13px;
+  padding:11px 20px;
+  cursor:pointer;
+  box-shadow:5px 5px 13px var(--sh-d), -5px -5px 13px var(--sh-l);
+  transition:transform .22s var(--ease), box-shadow .22s var(--ease), color .2s;
+}
+.btn:hover{transform:translateY(-2px);color:var(--acc);}
+.btn:active{transform:translateY(1px);box-shadow:inset 3px 3px 8px var(--sh-d), inset -3px -3px 8px var(--sh-l);}
+.btn.primary{
+  color:#fff;
+  background:linear-gradient(150deg,#8fa0c9,#7a8cb8);
+  box-shadow:0 8px 20px rgba(122,140,184,.42), inset 0 1px 0 rgba(255,255,255,.35);
+}
+.btn.primary:hover{color:#fff;box-shadow:0 12px 26px rgba(122,140,184,.5);}
+
+/* ============================================================
+   6. LIVE SCOREBOARD
+   ============================================================ */
+.stats-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+  gap:14px;
+}
+.stat-card{
+  position:relative;
+  border-radius:var(--r-md);
+  padding:16px 14px 14px;
+  text-align:center;
+  background:linear-gradient(150deg,#f7fafd,#e5ebf4);
+  box-shadow:6px 6px 16px var(--sh-d), -6px -6px 16px var(--sh-l),
+             inset 0 1px 0 rgba(255,255,255,.95);
+  transition:transform .38s var(--ease), box-shadow .38s var(--ease);
+  overflow:hidden;
+  transform-style:preserve-3d;
+}
+.stat-card:hover{
+  transform:translateY(-5px) rotateX(6deg);
+  box-shadow:10px 14px 26px var(--sh-d), -8px -8px 20px var(--sh-l);
+}
+.stat-card .val{
+  font-size:clamp(1.5rem,4.2vw,2.05rem);
+  font-weight:800;
+  letter-spacing:-.03em;
+  color:var(--acc);
+  line-height:1;
+  display:block;
+  transition:color .3s, transform .3s var(--ease);
+  text-shadow:0 1px 0 #fff, 0 4px 10px rgba(140,152,180,.28);
+}
+.stat-card.pulse .val{transform:scale(1.14);}
+.stat-card .key{
+  display:block;
+  margin-top:8px;
+  font-size:.63rem;
+  font-weight:800;
+  letter-spacing:.15em;
+  text-transform:uppercase;
+  color:var(--txt-dim);
+}
+.stat-card .bar{
+  position:absolute;left:0;bottom:0;height:3px;width:0%;
+  background:linear-gradient(90deg,var(--acc),var(--acc-2));
+  border-radius:3px;
+  transition:width .5s var(--ease);
 }
 
 /* ============================================================
-   3. APP SHELL
+   7. TYPING AREA
    ============================================================ */
-.app{
-  position:relative;
-  z-index:1;
-  max-width:1020px;
-  margin:0 auto;
-  padding:26px 20px 72px;
-  display:flex;
-  flex-direction:column;
-  gap:18px;
-}
-
-/* ---------------- top bar ---------------- */
-.topbar{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:16px;
-  padding:14px 20px;
-  border-radius:var(--r-xl);
-  background:linear-gradient(180deg,rgba(255,255,255,.88),rgba(255,255,255,.62));
-  border:1px solid rgba(255,255,255,.92);
-  box-shadow:var(--raise);
-  backdrop-filter:blur(22px) saturate(150%);
-  -webkit-backdrop-filter:blur(22px) saturate(150%);
-  animation:slideDown .7s var(--ease) both;
-}
-@keyframes slideDown{
-  from{opacity:0;transform:translateY(-18px);}
-  to  {opacity:1;transform:translateY(0);}
-}
-
-.brand{display:flex;align-items:center;gap:13px;}
-
-.logo{
-  width:46px;height:46px;
-  display:grid;place-items:center;
-  font-size:22px;
-  border-radius:14px;
-  background:linear-gradient(160deg,#ffffff,#e6ebf5);
-  box-shadow:
-     inset 0 2px 0 rgba(255,255,255,.95),
-     inset 0 -2px 5px rgba(150,168,196,.22),
-     0 8px 18px rgba(140,157,185,.28);
-  transform:perspective(600px) rotateX(10deg);
-  transition:transform .45s var(--bounce);
-}
-.logo:hover{transform:perspective(600px) rotateX(0deg) translateY(-2px);}
-
-.brand h1{
-  font-size:19px;
-  font-weight:750;
-  letter-spacing:-.02em;
-  line-height:1.1;
-}
-.brand p{
-  font-size:11.5px;
-  color:var(--ink3);
-  letter-spacing:.03em;
-  margin-top:3px;
-}
-
-.best-badge{
-  font-size:12.5px;
-  font-weight:650;
-  letter-spacing:.02em;
-  color:var(--ink2);
-  padding:9px 16px;
-  border-radius:999px;
-  background:linear-gradient(180deg,#fdfefe,#e9eef6);
-  border:1px solid rgba(255,255,255,.92);
-  box-shadow:var(--soft);
-  white-space:nowrap;
-}
-.best-badge b{color:var(--accent);}
-
-/* ---------------- ad slots ---------------- */
-.ad-slot{
-  position:relative;
-  display:grid;
-  place-items:center;
-  border-radius:var(--r-lg);
-  border:1px dashed rgba(150,168,196,.45);
-  background:
-     repeating-linear-gradient(135deg,
-        rgba(255,255,255,.52) 0 12px,
-        rgba(244,247,252,.52) 12px 24px);
-  color:var(--ink4);
-  font-size:10.5px;
-  font-weight:700;
-  letter-spacing:.18em;
-  text-transform:uppercase;
-  overflow:hidden;
-  transition:border-color .3s var(--ease);
-}
-.ad-slot:hover{border-color:rgba(91,124,250,.5);}
-.ad-top{height:92px;}
-.ad-mid{height:92px;}
-.ad-res{height:74px;margin-top:8px;}
-
-.ad-slot::after{
-  content:"";
-  position:absolute;inset:0;
-  background:linear-gradient(100deg,transparent 22%,rgba(255,255,255,.78) 50%,transparent 78%);
-  transform:translateX(-130%);
-  animation:adShine 6.5s ease-in-out infinite;
-}
-@keyframes adShine{
-  0%,68%{transform:translateX(-130%);}
-  100%  {transform:translateX(130%);}
-}
-
-/* ---------------- main card ---------------- */
-.card{
-  padding:24px 26px 28px;
-  border-radius:var(--r-xl);
-  background:linear-gradient(180deg,rgba(255,255,255,.86),rgba(255,255,255,.6));
-  border:1px solid rgba(255,255,255,.92);
-  box-shadow:var(--raise);
-  backdrop-filter:blur(24px) saturate(150%);
-  -webkit-backdrop-filter:blur(24px) saturate(150%);
-  animation:cardIn .8s .08s var(--ease) both;
-}
-@keyframes cardIn{
-  from{opacity:0;transform:translateY(22px) scale(.985);}
-  to  {opacity:1;transform:translateY(0) scale(1);}
-}
-
-/* ---------------- controls ---------------- */
-.controls{
+.type-panel{padding:0;overflow:hidden;}
+.type-head{
   display:flex;
   align-items:center;
   justify-content:space-between;
   gap:14px;
+  padding:16px 22px 12px;
   flex-wrap:wrap;
-  margin-bottom:20px;
 }
-
-.times{
-  display:flex;
-  gap:6px;
-  flex-wrap:wrap;
-  padding:6px;
-  border-radius:999px;
-  background:linear-gradient(180deg,#e7ecf4,#f2f5fa);
-  box-shadow:var(--press);
-}
-
-.time-btn{
-  border:0;
-  cursor:pointer;
-  font-family:inherit;
-  font-size:12.5px;
-  font-weight:650;
-  letter-spacing:.02em;
-  color:var(--ink2);
-  padding:9px 16px;
-  border-radius:999px;
-  background:transparent;
-  transition:all .25s var(--ease);
-}
-.time-btn:hover{color:var(--ink);}
-
-.time-btn.active{
-  color:#fff;
-  background:linear-gradient(180deg,var(--accent2),var(--accent));
-  box-shadow:
-     inset 0 1px 0 rgba(255,255,255,.5),
-     0 4px 12px rgba(91,124,250,.4),
-     0 1px 2px rgba(91,124,250,.35);
-  transform:translateY(-1px);
-}
-
-.btn{
-  font-family:inherit;
-  font-size:12.5px;
-  font-weight:650;
-  letter-spacing:.02em;
-  border:1px solid rgba(255,255,255,.9);
-  cursor:pointer;
-  padding:10px 20px;
-  border-radius:12px;
-  background:linear-gradient(180deg,#ffffff,#e9eef6);
-  color:var(--ink2);
-  box-shadow:var(--soft);
-  transition:all .22s var(--ease);
-}
-.btn:hover{transform:translateY(-1px);color:var(--ink);box-shadow:0 6px 18px rgba(140,157,185,.22);}
-.btn:active{transform:translateY(1px);box-shadow:var(--press);}
-
-.btn.primary{
-  color:#fff;
-  border-color:transparent;
-  background:linear-gradient(180deg,var(--accent2),var(--accent));
-  box-shadow:
-     inset 0 1px 0 rgba(255,255,255,.45),
-     0 6px 18px rgba(91,124,250,.4);
-}
-.btn.primary:hover{box-shadow:0 10px 24px rgba(91,124,250,.5);}
-
-/* ---------------- stats ---------------- */
-.stats{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:10px;
-  margin-bottom:16px;
-}
-
-.stat{
-  padding:13px 12px;
-  border-radius:var(--r-md);
-  text-align:center;
-  background:linear-gradient(180deg,#fdfefe,#eef2f8);
-  box-shadow:
-     inset 0 1px 0 rgba(255,255,255,.95),
-     inset 0 -2px 5px rgba(150,168,196,.13),
-     0 5px 14px rgba(140,157,185,.14);
-  transition:transform .3s var(--ease);
-}
-.stat:hover{transform:translateY(-2px);}
-
-.stat .label{
-  display:block;
-  font-size:9.5px;
-  font-weight:750;
-  letter-spacing:.16em;
+.pill{
+  font-size:.68rem;
+  font-weight:800;
+  letter-spacing:.12em;
   text-transform:uppercase;
-  color:var(--ink4);
-  margin-bottom:5px;
+  color:var(--acc);
+  background:linear-gradient(150deg,#eef3fa,#dfe7f2);
+  padding:7px 14px;
+  border-radius:999px;
+  box-shadow:inset 2px 2px 6px var(--sh-d), inset -2px -2px 6px var(--sh-l);
 }
-.stat .value{
-  display:block;
-  font-size:23px;
-  font-weight:750;
-  letter-spacing:-.03em;
-  color:var(--ink);
-  font-variant-numeric:tabular-nums;
-}
-.stat .value.pulse{animation:valPulse .36s var(--bounce);}
-@keyframes valPulse{
-  0%  {transform:scale(1);}
-  45% {transform:scale(1.17);color:var(--accent);}
-  100%{transform:scale(1);}
-}
-
-/* ---------------- progress ---------------- */
-.progress{
-  height:7px;
-  border-radius:99px;
-  background:linear-gradient(180deg,#e3e9f2,#eef2f8);
-  box-shadow:inset 0 1px 3px rgba(150,168,196,.3);
+.progress-track{
+  height:6px;
+  margin:0 22px;
+  border-radius:999px;
+  background:linear-gradient(150deg,#dfe6f0,#eef3fa);
+  box-shadow:inset 3px 3px 7px var(--sh-d), inset -3px -3px 7px var(--sh-l);
   overflow:hidden;
-  margin-bottom:20px;
 }
-.progress .bar{
-  height:100%;
-  width:100%;
-  border-radius:99px;
-  background:linear-gradient(90deg,var(--accent),var(--accent2));
-  box-shadow:0 0 12px rgba(91,124,250,.55);
-  transition:width .15s linear, background .3s;
+.progress-fill{
+  height:100%;width:0%;
+  border-radius:999px;
+  background:linear-gradient(90deg,#8fa0c9,#a294bd,#8fae9f);
+  transition:width .35s linear;
+  box-shadow:0 0 12px rgba(143,160,201,.65);
 }
-.progress .bar.low{
-  background:linear-gradient(90deg,#d9776f,#e8a05f);
-  box-shadow:0 0 12px rgba(217,119,111,.55);
+.text-display{
+  white-space:pre-wrap;
+  word-break:break-word;
+  font-size:clamp(1.05rem,2.35vw,1.5rem);
+  line-height:2.05;
+  letter-spacing:.012em;
+  padding:26px 22px 22px;
+  height:250px;
+  overflow-y:auto;
+  scrollbar-width:thin;
+  scrollbar-color:#c6cfdd transparent;
+  color:var(--txt-dim);
+  font-weight:500;
+  outline:none;
+  transition:background .35s ease;
 }
+.text-display::-webkit-scrollbar{width:7px;}
+.text-display::-webkit-scrollbar-thumb{
+  background:#c6cfdd;border-radius:99px;
+}
+.text-display:focus{background:rgba(255,255,255,.28);}
 
-/* ---------------- typing viewport ---------------- */
-.viewport{
-  position:relative;
-  height:calc(var(--lh) * 3 + 26px);
-  padding:13px 16px;
-  border-radius:var(--r-md);
-  overflow:hidden;
-  background:linear-gradient(180deg,#f7f9fc,#eef2f8);
-  box-shadow:
-     inset 0 1px 0 rgba(255,255,255,.9),
-     inset 0 3px 10px rgba(150,168,196,.2),
-     0 1px 2px rgba(150,168,196,.12);
-  cursor:text;
-  user-select:none;
+.ch{transition:color .12s ease, background .12s ease;border-radius:4px;}
+.ch.ok{color:var(--ok);}
+.ch.bad{color:var(--bad);background:var(--bad-bg);text-decoration:underline wavy rgba(184,120,120,.5);}
+.ch.space.bad{background:var(--bad-bg);}
+.ch.cur{
+  background:linear-gradient(150deg,rgba(123,140,184,.22),rgba(162,148,189,.22));
+  box-shadow:0 0 0 2px rgba(123,140,184,.22), 0 3px 9px rgba(123,140,184,.25);
+  animation:caretPulse 1.1s ease-in-out infinite;
 }
-
-.text-inner{
-  position:relative;
-  font-size:21px;
-  line-height:var(--lh);
-  letter-spacing:.1px;
-  font-weight:450;
-  color:var(--ink4);
-  transition:transform .2s var(--ease);
-  will-change:transform;
+@keyframes caretPulse{
+  0%,100%{box-shadow:0 0 0 2px rgba(123,140,184,.22), 0 3px 9px rgba(123,140,184,.22);}
+  50%    {box-shadow:0 0 0 4px rgba(123,140,184,.14), 0 5px 14px rgba(123,140,184,.4);}
 }
-
-.word{
-  display:inline-block;
-  vertical-align:top;
-  white-space:pre;
-}
-
-.ch{
-  border-radius:3px;
-  transition:color .09s linear, background-color .09s linear;
-}
-.ch.correct{color:#2b3547;}
-.ch.wrong{
-  color:var(--bad);
-  background:rgba(212,101,95,.14);
-  box-shadow:inset 0 1px 0 rgba(212,101,95,.32);
-}
-
-.caret{
-  position:absolute;
-  top:0;left:0;
-  width:2.5px;
-  height:var(--caret-h);
-  border-radius:3px;
-  background:linear-gradient(180deg,var(--accent2),var(--accent));
-  box-shadow:0 0 10px rgba(91,124,250,.75), 0 0 2px rgba(91,124,250,.9);
-  transition:transform .09s linear, opacity .2s;
-  animation:caretBlink 1.1s steps(1,end) infinite;
-  pointer-events:none;
-  will-change:transform;
-}
-@keyframes caretBlink{
-  0%,49%  {opacity:1;}
-  50%,100%{opacity:.12;}
-}
-body.typing .caret{animation:none;opacity:1;}
-
-.hint{
-  margin-top:14px;
-  text-align:center;
-  font-size:12px;
+.type-hint{
+  padding:0 22px 16px;
+  font-size:.72rem;
+  color:var(--txt-dim);
   letter-spacing:.06em;
-  color:var(--ink4);
-  transition:opacity .4s var(--ease);
-}
-
-/* ---------------- animated keyboard ---------------- */
-.keyboard{
-  padding:16px;
-  border-radius:var(--r-xl);
-  background:linear-gradient(180deg,rgba(255,255,255,.84),rgba(255,255,255,.56));
-  border:1px solid rgba(255,255,255,.92);
-  box-shadow:var(--raise);
-  backdrop-filter:blur(22px) saturate(150%);
-  -webkit-backdrop-filter:blur(22px) saturate(150%);
-  animation:cardIn .8s .16s var(--ease) both;
-  perspective:1500px;
-}
-
-.kb-row{
-  display:flex;
-  gap:6px;
-  margin-bottom:6px;
-}
-.kb-row:last-child{margin-bottom:0;}
-
-.key{
-  flex:1 1 0;
-  min-width:0;
-  height:42px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:11px;
-  font-weight:650;
-  letter-spacing:.03em;
-  color:var(--ink2);
-  border-radius:9px;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
-  user-select:none;
-  background:linear-gradient(180deg,#ffffff 0%,#eaeff7 100%);
-  box-shadow:
-     inset 0 1px 0 rgba(255,255,255,1),
-     inset 0 -2px 3px rgba(150,168,196,.22),
-     0 3px 0 rgba(186,199,220,.55),
-     0 5px 10px rgba(140,157,185,.22);
-  transition:transform .09s var(--ease),
-             box-shadow .09s var(--ease),
-             background .18s var(--ease),
-             color .18s var(--ease);
-  will-change:transform;
-}
-.key.mod{color:var(--ink3);font-size:10px;}
-
-.key.active{
-  transform:translateY(3px);
-  color:var(--accent);
-  background:linear-gradient(180deg,#e8edfb,#f7f9ff);
-  box-shadow:
-     inset 0 1px 4px rgba(120,140,175,.35),
-     0 0 0 1px rgba(91,124,250,.38),
-     0 0 16px rgba(91,124,250,.38);
 }
 
 /* ============================================================
-   4. RESULT OVERLAY / ANIMATED SCOREBOARD
+   8. VIRTUAL KEYBOARD
+   ============================================================ */
+.kb-panel{overflow:hidden;}
+.kb-head{
+  display:flex;justify-content:space-between;align-items:center;
+  gap:12px;flex-wrap:wrap;margin-bottom:15px;
+}
+.keyboard{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  perspective:900px;
+}
+.kb-row{
+  display:flex;
+  gap:7px;
+  justify-content:center;
+}
+.key{
+  font-family:inherit;
+  flex:1 1 0;
+  min-width:0;
+  height:46px;
+  border:none;
+  border-radius:11px;
+  cursor:pointer;
+  font-size:.82rem;
+  font-weight:700;
+  color:var(--txt-soft);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  line-height:1;
+  gap:2px;
+  background:linear-gradient(178deg,#f8fbff 0%,#e8eef7 55%,#dfe6f1 100%);
+  box-shadow:
+     0 3px 0 #c5cedb,
+     0 6px 12px rgba(150,162,184,.35),
+     inset 0 1px 0 #fff,
+     inset 0 -1px 0 rgba(255,255,255,.4);
+  transition:transform .1s ease, box-shadow .1s ease, background .18s, color .18s;
+  transform-style:preserve-3d;
+  user-select:none;
+  -webkit-tap-highlight-color:transparent;
+  padding:0 3px;
+}
+.key:hover{color:var(--acc);background:linear-gradient(178deg,#fff,#eef3fa);}
+.key.active{
+  transform:translateY(3px);
+  color:#fff;
+  background:linear-gradient(178deg,#93a3cb,#7c8db8);
+  box-shadow:
+     0 0 0 #c5cedb,
+     0 2px 5px rgba(120,136,181,.45),
+     inset 0 2px 5px rgba(60,74,110,.45);
+}
+.key.next{
+  color:#5f7599;
+  background:linear-gradient(178deg,#eef4ff,#dde7f8);
+  box-shadow:
+     0 3px 0 #b9c5da,
+     0 0 0 2px rgba(123,140,184,.35),
+     0 6px 14px rgba(123,140,184,.35),
+     inset 0 1px 0 #fff;
+}
+.key .sub{
+  font-size:.55rem;
+  font-weight:600;
+  opacity:.55;
+  letter-spacing:.02em;
+}
+.key.w15{flex:1.5 1 0;}
+.key.w18{flex:1.8 1 0;}
+.key.w2 {flex:2 1 0;font-size:.72rem;}
+.key.w22{flex:2.3 1 0;font-size:.72rem;}
+.key.space{flex:8 1 0;font-size:.7rem;letter-spacing:.2em;}
+
+.kb-note{
+  margin-top:14px;
+  font-size:.7rem;
+  color:var(--txt-dim);
+  text-align:center;
+  letter-spacing:.05em;
+}
+
+/* ============================================================
+   9. RECENT SCORES
+   ============================================================ */
+.recent-list{display:flex;flex-direction:column;gap:9px;}
+.recent-row{
+  display:grid;
+  grid-template-columns:34px 1fr auto auto auto;
+  align-items:center;
+  gap:12px;
+  padding:11px 15px;
+  border-radius:13px;
+  background:linear-gradient(150deg,#f6f9fd,#e6ecf5);
+  box-shadow:4px 4px 11px var(--sh-d), -4px -4px 11px var(--sh-l);
+  font-size:.83rem;
+  animation:rowIn .55s var(--ease) both;
+}
+@keyframes rowIn{
+  from{opacity:0;transform:translateX(-18px) scale(.97);}
+  to{opacity:1;transform:none;}
+}
+.recent-row .rank{
+  width:26px;height:26px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.72rem;font-weight:800;color:#fff;
+  background:linear-gradient(145deg,#a3b0cf,#8494bb);
+  box-shadow:0 3px 8px rgba(132,148,187,.45);
+}
+.recent-row .wpm{font-weight:800;color:var(--acc);font-size:1rem;}
+.recent-row .meta{color:var(--txt-dim);font-size:.72rem;letter-spacing:.05em;}
+.recent-row .acc{color:var(--ok);font-weight:700;}
+.empty-msg{
+  color:var(--txt-dim);
+  font-size:.82rem;
+  text-align:center;
+  padding:16px;
+  letter-spacing:.05em;
+}
+
+/* ============================================================
+   10. RESULT MODAL / ANIMATED SCOREBOARD
    ============================================================ */
 .overlay{
   position:fixed;
   inset:0;
   z-index:60;
-  display:grid;
-  place-items:center;
-  padding:22px;
-  background:rgba(226,232,242,.74);
-  backdrop-filter:blur(16px) saturate(140%);
-  -webkit-backdrop-filter:blur(16px) saturate(140%);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:rgba(214,221,233,.72);
+  backdrop-filter:blur(14px) saturate(.85);
+  -webkit-backdrop-filter:blur(14px) saturate(.85);
   opacity:0;
   visibility:hidden;
-  transition:opacity .35s var(--ease), visibility .35s;
+  transition:opacity .45s ease, visibility .45s;
 }
 .overlay.show{opacity:1;visibility:visible;}
 
-.result-card{
-  width:min(580px,100%);
+.scoreboard{
+  position:relative;
+  width:min(560px,100%);
   max-height:92vh;
   overflow-y:auto;
-  padding:30px 30px 24px;
-  border-radius:30px;
-  background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(248,250,254,.92));
-  border:1px solid rgba(255,255,255,.96);
-  box-shadow:
-     inset 0 1px 0 rgba(255,255,255,1),
-     0 30px 70px rgba(120,140,175,.32),
-     0 8px 24px rgba(120,140,175,.18);
-  transform:scale(.9) translateY(24px);
-  opacity:0;
-  transition:transform .5s var(--bounce), opacity .4s var(--ease);
-}
-.overlay.show .result-card{transform:scale(1) translateY(0);opacity:1;}
-
-.res-head{
+  border-radius:28px;
+  padding:30px 26px 26px;
   text-align:center;
-  font-size:10.5px;
-  font-weight:750;
-  letter-spacing:.24em;
-  text-transform:uppercase;
-  color:var(--ink4);
-  margin-bottom:8px;
+  background:linear-gradient(150deg,#f6f9fd 0%,#e3e9f3 100%);
+  border:1px solid rgba(255,255,255,.85);
+  box-shadow:
+     22px 22px 55px rgba(168,178,198,.6),
+    -18px -18px 45px rgba(255,255,255,.95),
+     inset 0 1px 0 rgba(255,255,255,.95);
+  transform:translateY(34px) scale(.93) rotateX(12deg);
+  opacity:0;
+  transition:transform .6s var(--ease), opacity .45s ease;
+}
+.overlay.show .scoreboard{transform:none;opacity:1;}
+
+.sb-title{
+  font-size:1.35rem;font-weight:800;letter-spacing:-.02em;
+  background:linear-gradient(150deg,#66759b,#8a7fae,#6f9b8b);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.sb-sub{
+  margin-top:6px;font-size:.7rem;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--txt-dim);font-weight:700;
 }
 
-.big-stat{text-align:center;margin:4px 0 22px;}
-
-.big-value{
-  font-size:80px;
+.sb-hero{margin:22px 0 6px;}
+.sb-hero .num{
+  font-size:clamp(3rem,12vw,4.4rem);
   font-weight:800;
-  line-height:1;
   letter-spacing:-.05em;
-  font-variant-numeric:tabular-nums;
-  background:linear-gradient(160deg,#4a68e0,#7f9bff 55%,#a3b6ff);
-  -webkit-background-clip:text;
-  background-clip:text;
-  color:transparent;
-  filter:drop-shadow(0 6px 16px rgba(91,124,250,.28));
+  line-height:1;
+  color:var(--acc);
+  text-shadow:0 1px 0 #fff, 0 10px 26px rgba(140,152,180,.42);
 }
-.big-label{
-  font-size:10.5px;
-  font-weight:750;
-  letter-spacing:.22em;
-  text-transform:uppercase;
-  color:var(--ink4);
-  margin-top:9px;
+.sb-hero .lbl{
+  margin-top:8px;font-size:.68rem;font-weight:800;
+  letter-spacing:.2em;text-transform:uppercase;color:var(--txt-dim);
 }
 
-.res-grid{
+.sb-ring-wrap{
+  position:relative;
+  width:150px;height:150px;
+  margin:16px auto 20px;
+}
+.ring{width:150px;height:150px;transform:rotate(-90deg);}
+.ring circle{fill:none;stroke-linecap:round;}
+.ring-bg{stroke:#dbe2ee;stroke-width:9;}
+.ring-fg{
+  stroke:url(#gradRing);
+  stroke-width:9;
+  stroke-dasharray:326.7;
+  stroke-dashoffset:326.7;
+  transition:stroke-dashoffset 1.5s var(--ease);
+  filter:drop-shadow(0 3px 6px rgba(123,140,184,.45));
+}
+.ring-text{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  font-size:1.55rem;font-weight:800;color:var(--acc);
+  letter-spacing:-.02em;
+}
+.ring-text small{
+  font-size:.58rem;font-weight:800;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--txt-dim);margin-top:3px;
+}
+
+.sb-stats{
   display:grid;
   grid-template-columns:repeat(4,1fr);
-  gap:9px;
+  gap:10px;
   margin-bottom:20px;
 }
-.res-grid > div{
-  padding:12px 8px;
+.sb-stat{
   border-radius:14px;
-  text-align:center;
-  background:linear-gradient(180deg,#fdfefe,#eef2f8);
-  box-shadow:
-     inset 0 1px 0 rgba(255,255,255,.95),
-     inset 0 -2px 5px rgba(150,168,196,.13),
-     0 4px 12px rgba(140,157,185,.12);
-  animation:popIn .5s var(--bounce) both;
+  padding:12px 6px;
+  background:linear-gradient(150deg,#f8fbff,#e5ebf4);
+  box-shadow:4px 4px 11px var(--sh-d), -4px -4px 11px var(--sh-l);
 }
-.res-grid > div:nth-child(1){animation-delay:.14s;}
-.res-grid > div:nth-child(2){animation-delay:.23s;}
-.res-grid > div:nth-child(3){animation-delay:.32s;}
-.res-grid > div:nth-child(4){animation-delay:.41s;}
-@keyframes popIn{
-  from{opacity:0;transform:translateY(14px) scale(.9);}
-  to  {opacity:1;transform:translateY(0) scale(1);}
+.sb-stat .v{
+  display:block;font-size:1.05rem;font-weight:800;color:var(--acc);
 }
-.res-grid span{
-  display:block;
-  font-size:20px;
-  font-weight:750;
-  letter-spacing:-.03em;
-  color:var(--ink);
-  font-variant-numeric:tabular-nums;
-}
-.res-grid label{
-  display:block;
-  font-size:9px;
-  font-weight:750;
-  letter-spacing:.14em;
-  text-transform:uppercase;
-  color:var(--ink4);
-  margin-top:5px;
+.sb-stat .k{
+  display:block;margin-top:5px;font-size:.55rem;font-weight:800;
+  letter-spacing:.11em;text-transform:uppercase;color:var(--txt-dim);
 }
 
-.chart{
-  display:flex;
-  align-items:flex-end;
-  gap:3px;
-  height:82px;
-  padding:0 2px;
-  margin-bottom:16px;
-  border-bottom:1px solid var(--line);
+.sb-bars{display:flex;flex-direction:column;gap:10px;margin-bottom:22px;text-align:left;}
+.sb-bar-row{display:flex;align-items:center;gap:11px;font-size:.7rem;font-weight:700;color:var(--txt-soft);}
+.sb-bar-row .nm{width:82px;letter-spacing:.06em;text-transform:uppercase;font-size:.6rem;color:var(--txt-dim);}
+.sb-bar-row .tr{
+  flex:1;height:9px;border-radius:99px;overflow:hidden;
+  background:linear-gradient(150deg,#dde4ee,#eef3fa);
+  box-shadow:inset 2px 2px 6px var(--sh-d), inset -2px -2px 6px var(--sh-l);
 }
-.chart-bar{
-  flex:1 1 0;
-  min-width:2px;
-  height:0%;
-  border-radius:4px 4px 2px 2px;
-  background:linear-gradient(180deg,var(--accent2),var(--accent));
-  box-shadow:0 0 8px rgba(91,124,250,.35);
-  transition:height .6s var(--bounce);
+.sb-bar-row .fl{
+  height:100%;width:0;border-radius:99px;
+  background:linear-gradient(90deg,#8fa0c9,#a294bd);
+  transition:width 1.3s var(--ease);
+  box-shadow:0 0 10px rgba(143,160,201,.6);
 }
+.sb-bar-row .pc{width:44px;text-align:right;font-weight:800;color:var(--acc);font-size:.75rem;}
 
-.verdict{
-  text-align:center;
-  font-size:13px;
-  font-weight:600;
-  color:var(--ink2);
-  padding:12px 16px;
-  border-radius:14px;
-  background:linear-gradient(180deg,#f4f7fc,#eaeff8);
-  box-shadow:inset 0 2px 8px rgba(150,168,196,.15);
-  animation:popIn .5s .5s var(--bounce) both;
-}
-
-.res-actions{
-  display:flex;
-  gap:10px;
-  justify-content:center;
-  margin-top:16px;
-}
+.sb-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
 
 /* ============================================================
-   5. RESPONSIVE
+   11. RESPONSIVE
    ============================================================ */
-@media (max-width:820px){
-  .app{padding:16px 12px 52px;}
-  .card{padding:18px 16px 22px;}
-  :root{--lh:40px;--caret-h:23px;}
-  .text-inner{font-size:17px;}
-  .viewport{height:calc(var(--lh) * 3 + 22px);padding:11px 12px;}
-  .key{height:34px;font-size:9.5px;border-radius:7px;}
-  .kb-row{gap:4px;margin-bottom:4px;}
-  .keyboard{padding:10px;}
-  .stats{grid-template-columns:repeat(2,1fr);}
-  .stat .value{font-size:19px;}
-  .big-value{font-size:60px;}
-  .res-grid{grid-template-columns:repeat(2,1fr);}
-  .brand p{display:none;}
+@media (max-width:760px){
+  .page{padding:22px 12px 60px;gap:16px;}
+  .panel{padding:16px 15px;border-radius:18px;}
+  .type-head{padding:14px 15px 10px;}
+  .progress-track{margin:0 15px;}
+  .text-display{padding:20px 15px;height:220px;line-height:1.95;}
+  .type-hint{padding:0 15px 14px;}
+  .key{height:40px;font-size:.72rem;border-radius:9px;}
+  .key.w2,.key.w22,.key.w15,.key.w18{font-size:.6rem;}
+  .kb-row{gap:4px;}
+  .keyboard{gap:5px;}
+  .sb-stats{grid-template-columns:repeat(2,1fr);}
+  .recent-row{grid-template-columns:28px 1fr auto;font-size:.76rem;}
+  .recent-row .meta.hide-sm{display:none;}
+  .controls-row{flex-direction:column;align-items:flex-start;}
 }
-
-@media (max-width:520px){
-  .time-btn{padding:8px 11px;font-size:11px;}
-  .ad-top,.ad-mid{height:72px;}
-}
-
-@media (prefers-reduced-motion:reduce){
-  *,*::before,*::after{
-    animation-duration:.001ms !important;
-    animation-iteration-count:1 !important;
-    transition-duration:.001ms !important;
-  }
+@media (max-width:430px){
+  .key{height:36px;font-size:.66rem;}
+  .key .sub{display:none;}
+  .text-display{font-size:1rem;line-height:1.85;}
 }
 </style>
 </head>
 
 <body>
 
-<!-- ================= AMBIENT BACKGROUND ================= -->
-<div class="float-layer" id="floatLayer" aria-hidden="true"></div>
+<!-- ============ FLOATING BACKGROUND WORDS ============ -->
+<div id="bgLayer" aria-hidden="true"></div>
 
-<!-- ===================== APP ===================== -->
-<div class="app">
+<!-- ============ SVG GRADIENT DEFS ============ -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <linearGradient id="gradRing" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"  stop-color="#8fa0c9"/>
+      <stop offset="55%" stop-color="#a294bd"/>
+      <stop offset="100%" stop-color="#8fae9f"/>
+    </linearGradient>
+  </defs>
+</svg>
 
-  <!-- top bar -->
-  <header class="topbar">
-    <div class="brand">
-      <div class="logo">⌨</div>
-      <div>
-        <h1>Typing Speed Test</h1>
-        <p>Measure &amp; improve your typing speed</p>
-      </div>
-    </div>
-    <div class="best-badge" id="bestBadge">Best&nbsp;·&nbsp;<b>—</b> WPM</div>
+<div class="page">
+
+  <!-- ============ HERO ============ -->
+  <header class="hero">
+    <h1>TypeFlow</h1>
+    <p>Measure your speed · Master your rhythm</p>
   </header>
 
-  <!-- AD SLOT 1 : top leaderboard -->
-  <div class="ad-slot ad-top" data-ad-slot="top">
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9317887278098579"
-     crossorigin="anonymous"></script>
+  <!-- ============ AD SLOT (TOP BANNER) ============ -->
+  <!-- PASTE ADSENSE 728x90 / responsive UNIT BELOW -->
+  <div class="ad-slot">
+    Advertisement
+    <span class="small">728 × 90 banner slot</span>
   </div>
 
-  <!-- ============ TEST CARD ============ -->
-  <main class="card">
+  <!-- ============ CONTROLS ============ -->
+  <section class="panel">
+    <div class="controls-row">
+      <div class="control-group">
+        <span class="control-label">Duration</span>
+        <div class="time-btns" id="timeBtns">
+          <button class="tbtn" data-time="60">1 min</button>
+          <button class="tbtn" data-time="120">2 min</button>
+          <button class="tbtn" data-time="180">3 min</button>
+          <button class="tbtn active" data-time="300">5 min</button>
+          <button class="tbtn" data-time="480">8 min</button>
+          <button class="tbtn" data-time="600">10 min</button>
+        </div>
+      </div>
 
-    <div class="controls">
-      <div class="times" id="times"></div>
-      <button class="btn" id="restartBtn" type="button">↻ Restart</button>
-    </div>
-
-    <div class="stats">
-      <div class="stat"><span class="label">Time</span><span class="value" id="statTime">60</span></div>
-      <div class="stat"><span class="label">WPM</span><span class="value" id="statWpm">0</span></div>
-      <div class="stat"><span class="label">Accuracy</span><span class="value" id="statAcc">100%</span></div>
-      <div class="stat"><span class="label">Errors</span><span class="value" id="statErr">0</span></div>
-    </div>
-
-    <div class="progress"><div class="bar" id="progressBar"></div></div>
-
-    <div class="viewport" id="viewport">
-      <div class="text-inner" id="textInner">
-        <div class="caret" id="caret"></div>
+      <div class="control-group">
+        <span class="control-label">Language</span>
+        <div class="lang-toggle" id="langToggle">
+          <button class="active" data-lang="en">English</button>
+          <button data-lang="hi">हिन्दी</button>
+        </div>
+        <button class="btn" id="newTextBtnTop">⟳ New Text</button>
       </div>
     </div>
+  </section>
 
-    <div class="hint" id="hint">Start typing to begin the test…</div>
-  </main>
+  <!-- ============ LIVE SCOREBOARD ============ -->
+  <section class="panel">
+    <div class="panel-title">Live Scoreboard</div>
+    <div class="stats-grid">
+      <div class="stat-card" id="cardWpm">
+        <span class="val" id="liveWpm">0</span>
+        <span class="key">WPM</span>
+        <div class="bar" id="barWpm"></div>
+      </div>
+      <div class="stat-card" id="cardAcc">
+        <span class="val" id="liveAcc">100</span>
+        <span class="key">Accuracy %</span>
+        <div class="bar" id="barAcc"></div>
+      </div>
+      <div class="stat-card" id="cardTime">
+        <span class="val" id="liveTime">5:00</span>
+        <span class="key">Time Left</span>
+        <div class="bar" id="barTime"></div>
+      </div>
+      <div class="stat-card" id="cardErr">
+        <span class="val" id="liveErr">0</span>
+        <span class="key">Errors</span>
+        <div class="bar" id="barErr"></div>
+      </div>
+    </div>
+  </section>
 
-  <!-- AD SLOT 2 : in-content -->
-  <div class="ad-slot ad-mid" data-ad-slot="in-content">
-    <!-- Paste AdSense / ad-network code here -->
-    Advertisement · 970 × 90
+  <!-- ============ TYPING AREA ============ -->
+  <section class="panel type-panel">
+    <div class="type-head">
+      <span class="pill" id="modePill">English · 5 min</span>
+      <span class="pill" id="statusPill">Ready</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="text-display" id="textDisplay" tabindex="0"></div>
+    <div class="type-hint" id="typeHint">
+      Just start typing — the timer begins with your first keystroke. Use <b>Backspace</b> to correct.
+    </div>
+  </section>
+
+  <!-- ============ VIRTUAL KEYBOARD ============ -->
+  <section class="panel kb-panel">
+    <div class="kb-head">
+      <div class="panel-title" style="margin:0" id="kbTitle">English Keyboard</div>
+      <span class="pill" id="kbHint">Click a key or use your physical keyboard</span>
+    </div>
+    <div class="keyboard" id="keyboard"></div>
+    <div class="kb-note">
+      Keys light up as you type · The next expected key glows softly
+    </div>
+  </section>
+
+  <!-- ============ AD SLOT (INLINE) ============ -->
+  <!-- PASTE ADSENSE IN-ARTICLE UNIT BELOW -->
+  <div class="ad-slot">
+    Advertisement
+    <span class="small">In-article responsive slot</span>
   </div>
 
-  <!-- ============ ANIMATED KEYBOARD ============ -->
-  <div class="keyboard" id="keyboard" aria-hidden="true"></div>
+  <!-- ============ RECENT SCORES ============ -->
+  <section class="panel">
+    <div class="panel-title">Recent Scores</div>
+    <div class="recent-list" id="recentList">
+      <div class="empty-msg">No sessions yet — complete a test to fill the board.</div>
+    </div>
+  </section>
+
+  <!-- ============ AD SLOT (FOOTER) ============ -->
+  <!-- PASTE ADSENSE FOOTER UNIT BELOW -->
+  <div class="ad-slot">
+    Advertisement
+    <span class="small">Footer responsive slot</span>
+  </div>
 
 </div>
 
-<!-- ================= RESULT SCOREBOARD ================= -->
+<!-- ============ ANIMATED RESULT SCOREBOARD ============ -->
 <div class="overlay" id="overlay">
-  <div class="result-card">
+  <div class="scoreboard" id="scoreboard">
+    <h2 class="sb-title">Session Complete</h2>
+    <p class="sb-sub" id="sbSub">English · 5 minutes</p>
 
-    <div class="res-head">Test Complete</div>
-
-    <div class="big-stat">
-      <div class="big-value" id="rWpm">0</div>
-      <div class="big-label">Words per Minute</div>
+    <div class="sb-hero">
+      <div class="num" id="fWpm">0</div>
+      <div class="lbl">Words per Minute</div>
     </div>
 
-    <div class="res-grid">
-      <div><span id="rAcc">0%</span><label>Accuracy</label></div>
-      <div><span id="rErr">0</span><label>Errors</label></div>
-      <div><span id="rChars">0</span><label>Characters</label></div>
-      <div><span id="rTime">0s</span><label>Duration</label></div>
+    <div class="sb-ring-wrap">
+      <svg class="ring" viewBox="0 0 120 120">
+        <circle class="ring-bg" cx="60" cy="60" r="52"></circle>
+        <circle class="ring-fg" id="ringFg" cx="60" cy="60" r="52"></circle>
+      </svg>
+      <div class="ring-text">
+        <span id="fAcc">0</span>
+        <small>Accuracy</small>
+      </div>
     </div>
 
-    <div class="chart" id="chart"></div>
-
-    <div class="verdict" id="verdict">Nice work!</div>
-
-    <!-- AD SLOT 3 : result modal -->
-    <div class="ad-slot ad-res" data-ad-slot="result">
-      <!-- Paste AdSense / ad-network code here -->
-      Advertisement
+    <div class="sb-stats">
+      <div class="sb-stat"><span class="v" id="fRaw">0</span><span class="k">Raw WPM</span></div>
+      <div class="sb-stat"><span class="v" id="fCorrect">0</span><span class="k">Correct</span></div>
+      <div class="sb-stat"><span class="v" id="fWrong">0</span><span class="k">Errors</span></div>
+      <div class="sb-stat"><span class="v" id="fTime">0s</span><span class="k">Duration</span></div>
     </div>
 
-    <div class="res-actions">
-      <button class="btn primary" id="againBtn" type="button">Try Again</button>
-      <button class="btn" id="closeBtn" type="button">Close</button>
+    <div class="sb-bars">
+      <div class="sb-bar-row">
+        <span class="nm">Speed</span>
+        <span class="tr"><span class="fl" id="barSpeed"></span></span>
+        <span class="pc" id="pctSpeed">0%</span>
+      </div>
+      <div class="sb-bar-row">
+        <span class="nm">Accuracy</span>
+        <span class="tr"><span class="fl" id="barAcc2"></span></span>
+        <span class="pc" id="pctAcc">0%</span>
+      </div>
+      <div class="sb-bar-row">
+        <span class="nm">Control</span>
+        <span class="tr"><span class="fl" id="barCtrl"></span></span>
+        <span class="pc" id="pctCtrl">0%</span>
+      </div>
+    </div>
+
+    <div class="sb-actions">
+      <button class="btn primary" id="againBtn">Try Again</button>
+      <button class="btn" id="newTextBtn">New Text</button>
     </div>
   </div>
 </div>
 
 <script>
-/* ================================================================
-   1. LOCAL FALLBACK TEXT CORPUS
-   (used if the internet request fails or is blocked)
-   ================================================================ */
-const LOCAL_PARAGRAPHS = [
-  "The quick brown fox jumps over the lazy dog while the evening sun settles behind the quiet hills. Typing well is less about raw speed and more about rhythm, so relax your shoulders and let your fingers find a steady pace.",
-  "Technology changes quickly, but the habits of clear thinking stay the same. A careful writer learns to listen, to pause, and to choose the simplest word that carries the right meaning.",
-  "Morning light filled the small kitchen as the kettle began to hum. She poured a cup of tea, opened her notebook, and wrote down three things she wanted to finish before noon.",
-  "Deep in the forest a narrow path wound between tall pines. The air smelled of rain and moss, and every step made a soft sound that seemed to belong to the place itself.",
-  "Practice does not make perfect on its own; deliberate practice does. Focus on the letters you keep missing, slow down for a moment, and let accuracy arrive before speed.",
-  "The library was almost empty that afternoon. Dust drifted through the tall windows, and the only sound was the gentle turning of pages from a reader in the far corner.",
-  "A good keyboard feels like an extension of your hands. When your posture is comfortable and your wrists are relaxed, the words begin to appear without much conscious effort at all.",
-  "Small improvements compound over time. Ten focused minutes each day will take you further than a single long session followed by a week of silence and forgotten habits.",
-  "The train moved through the valley as clouds gathered above the ridge. Passengers watched the fields slide past, each lost in a private thought about where they were going.",
-  "Clear writing is a kindness to the reader. Short sentences carry weight, paragraphs give the mind room to rest, and a well placed detail can make an ordinary scene feel alive.",
-  "Scientists often say that the best experiment is the one that surprises you. A result you did not expect is not a failure; it is a door that has just opened onto a new question.",
-  "Music filled the hall as the orchestra tuned their instruments. A single note from the oboe cut through the noise, and silence settled over the rows of waiting listeners.",
-  "The old map showed a river that no longer existed. He traced it with one finger, wondering how many towns had been built on ground that the water had long since abandoned.",
-  "Good software disappears. You stop noticing the buttons, the menus, and the little delays, because everything simply responds the way your hand expected it to respond.",
-  "Rain tapped against the window in a slow uneven rhythm. He turned another page, drank the last of his coffee, and decided that the afternoon could wait a little longer.",
-  "Every craft has its quiet fundamentals. For a typist those fundamentals are posture, the home row, and the patience to stop and correct a mistake before it becomes a habit.",
-  "The market opened early and the streets filled with the smell of bread and roasted nuts. Vendors called out prices while bicycles wove between the slow moving crowd.",
-  "A clear sky at night reveals more stars than most people ever notice. Stand still for a few minutes, let your eyes adjust, and the darkness slowly begins to fill with light."
-];
+/* ============================================================
+   TYPEFLOW — APPLICATION SCRIPT
+   ============================================================ */
+(function () {
+  "use strict";
 
-const KEYWORDS = [
-  "speed","focus","rhythm","flow","accuracy","practice","keyboard","typing",
-  "precision","momentum","skill","patience","consistency","muscle memory",
-  "words per minute","timing","control","steady","improve","mastery",
-  "home row","dexterity","reflex","cadence","discipline","confidence"
-];
+  /* ----------------------------------------------------------
+     1. PARAGRAPH LIBRARY (English + Hindi)
+        Curated, royalty-free practice passages.
+        A random one is served on every new session.
+     ---------------------------------------------------------- */
+  const PARAGRAPHS = {
+    en: [
+      "The art of typing is not about speed alone but about rhythm and control. When your fingers learn to move without hesitation, words begin to flow like water down a quiet stream. Practice a little every single day, and soon the keyboard will feel like a natural extension of your own thoughts.",
+      "Technology has changed the way we communicate with one another. Messages that once took days to deliver now travel across the world in a matter of seconds. Yet the basic skill of putting thoughts into clear words remains unchanged, and those who can do it quickly and precisely always hold an advantage.",
+      "A quiet morning in the mountains can teach you more about patience than any book ever will. The sun rises slowly behind the grey peaks, the mist lifts from the valley floor, and the whole world seems to take one long, deep breath before it begins again.",
+      "Good design is invisible. You never notice it because it simply works, guiding your eyes and your hands without ever getting in the way. It is the result of countless small decisions, each one made with care and with the person on the other side firmly in mind.",
+      "Learning any new skill follows the same pattern. First comes confusion, then clumsy repetition, then a sudden moment of understanding, and finally quiet confidence. Most people give up somewhere in the middle of the second stage, which is exactly why so few ever reach the last one.",
+      "The ocean keeps its own calendar. Tides rise and fall with the moon, waves carry stories from distant shores, and the salt air holds the memory of every storm that ever passed through. Standing at the edge of it, you feel small and endless at the very same time.",
+      "Books are patient teachers. They wait on the shelf for years without a single complaint, and when you finally open them they give you everything they have. A single paragraph can change the direction of a life, if only it arrives at the right moment.",
+      "Every great invention began as a simple question. What if we could fly? What if light itself could carry a message? What if a machine could learn to think? The answer matters far less than the courage to ask, because the question is where everything truly starts.",
+      "Discipline is simply remembering what you want. It is the quiet voice that keeps you working when motivation has already packed up and gone home. Talent may open the door, but only steady, unglamorous practice will keep you in the room long enough to matter."
+    ],
+    hi: [
+      "टाइपिंग की गति केवल उंगलियों की नहीं, बल्कि मन की भी परीक्षा है। जब आप बिना रुके लिखते हैं तो शब्द अपने आप बहने लगते हैं। हर दिन थोड़ा अभ्यास कीजिए और धीरे धीरे कीबोर्ड आपके विचारों का हिस्सा बन जाएगा।",
+      "भारत एक विशाल और विविधताओं से भरा हुआ देश है। यहाँ अनेक भाषाएँ, अनेक रीति रिवाज और अनेक संस्कृतियाँ एक साथ मिलकर रहती हैं। यही विविधता हमारी सबसे बड़ी शक्ति है और इसे बनाए रखना हम सबका कर्तव्य है।",
+      "सुबह की ताज़ी हवा और पक्षियों का मधुर स्वर मन को शांति प्रदान करता है। जब सूरज धीरे धीरे पहाड़ों के पीछे से निकलता है तो पूरा वातावरण सुनहरी रोशनी से भर जाता है। यह समय ध्यान और चिंतन के लिए सबसे उत्तम होता है।",
+      "मेहनत और लगन से बड़ी से बड़ी बाधा को भी पार किया जा सकता है। असफलता से डरना नहीं चाहिए क्योंकि हर असफलता हमें कुछ नया सिखाती है। जो व्यक्ति गिरकर भी उठ खड़ा होता है वही अंत में सफल होता है।",
+      "कंप्यूटर और इंटरनेट ने हमारे जीवन को पूरी तरह बदल दिया है। आज सूचना कुछ ही क्षणों में एक स्थान से दूसरे स्थान तक पहुँच जाती है। लेकिन इस तकनीक का उपयोग सही दिशा में करना हमारी अपनी जिम्मेदारी है।",
+      "पुस्तकें हमारी सच्ची मित्र होती हैं। वे कभी साथ नहीं छोड़तीं और हमेशा कुछ न कुछ सिखाती रहती हैं। एक अच्छी पुस्तक पढ़ने से विचारों में गहराई आती है और व्यक्तित्व का सर्वांगीण विकास होता है।",
+      "समय सबसे मूल्यवान धन है। जो व्यक्ति समय का सदुपयोग करता है वह जीवन में सदा आगे बढ़ता है। आलस्य मनुष्य का सबसे बड़ा शत्रु है इसलिए हमें प्रत्येक क्षण का सही उपयोग करना चाहिए।"
+    ]
+  };
 
-const TIME_OPTIONS = [
-  { label:"1 min",  seconds:60   },
-  { label:"2 min",  seconds:120  },
-  { label:"3 min",  seconds:180  },
-  { label:"5 min",  seconds:300  },
-  { label:"8 min",  seconds:480  },
-  { label:"10 min", seconds:600  }
-];
-
-/* ================================================================
-   2. DOM REFERENCES
-   ================================================================ */
-const textInner   = document.getElementById('textInner');
-const caret       = document.getElementById('caret');
-const viewport    = document.getElementById('viewport');
-const keyboardEl  = document.getElementById('keyboard');
-const timesEl     = document.getElementById('times');
-const hintEl      = document.getElementById('hint');
-const overlay     = document.getElementById('overlay');
-const progressBar = document.getElementById('progressBar');
-const bestBadge   = document.getElementById('bestBadge');
-
-const statTime = document.getElementById('statTime');
-const statWpm  = document.getElementById('statWpm');
-const statAcc  = document.getElementById('statAcc');
-const statErr  = document.getElementById('statErr');
-
-const rWpm    = document.getElementById('rWpm');
-const rAcc    = document.getElementById('rAcc');
-const rErr    = document.getElementById('rErr');
-const rChars  = document.getElementById('rChars');
-const rTime   = document.getElementById('rTime');
-const chart   = document.getElementById('chart');
-const verdict = document.getElementById('verdict');
-
-/* ================================================================
-   3. AMBIENT BACKGROUND (floating keywords + orbs)
-   ================================================================ */
-(function buildBackground(){
-  const layer = document.getElementById('floatLayer');
-
-  const orbColors = [
-    'rgba(140,170,255,.55)',
-    'rgba(190,205,235,.65)',
-    'rgba(160,200,230,.50)',
-    'rgba(200,190,240,.45)'
+  /* ----------------------------------------------------------
+     2. KEYBOARD LAYOUTS
+     ---------------------------------------------------------- */
+  const EN_LAYOUT = [
+    [
+      {l:'`',o:'`',p:'`'},{l:'1',o:'1',p:'1'},{l:'2',o:'2',p:'2'},{l:'3',o:'3',p:'3'},
+      {l:'4',o:'4',p:'4'},{l:'5',o:'5',p:'5'},{l:'6',o:'6',p:'6'},{l:'7',o:'7',p:'7'},
+      {l:'8',o:'8',p:'8'},{l:'9',o:'9',p:'9'},{l:'0',o:'0',p:'0'},{l:'-',o:'-',p:'-'},
+      {l:'=',o:'=',p:'='},{l:'⌫',o:'',p:'backspace',w:'w2'}
+    ],
+    [
+      {l:'Tab',o:'',p:'tab',w:'w15'},
+      {l:'q',o:'q',p:'q'},{l:'w',o:'w',p:'w'},{l:'e',o:'e',p:'e'},{l:'r',o:'r',p:'r'},
+      {l:'t',o:'t',p:'t'},{l:'y',o:'y',p:'y'},{l:'u',o:'u',p:'u'},{l:'i',o:'i',p:'i'},
+      {l:'o',o:'o',p:'o'},{l:'p',o:'p',p:'p'},{l:'[',o:'[',p:'['},{l:']',o:']',p:']'},
+      {l:'\\',o:'\\',p:'\\',w:'w15'}
+    ],
+    [
+      {l:'Caps',o:'',p:'capslock',w:'w18'},
+      {l:'a',o:'a',p:'a'},{l:'s',o:'s',p:'s'},{l:'d',o:'d',p:'d'},{l:'f',o:'f',p:'f'},
+      {l:'g',o:'g',p:'g'},{l:'h',o:'h',p:'h'},{l:'j',o:'j',p:'j'},{l:'k',o:'k',p:'k'},
+      {l:'l',o:'l',p:'l'},{l:';',o:';',p:';'},{l:"'",o:"'",p:"'"},
+      {l:'Enter',o:'',p:'enter',w:'w22'}
+    ],
+    [
+      {l:'Shift',o:'',p:'shift',w:'w22'},
+      {l:'z',o:'z',p:'z'},{l:'x',o:'x',p:'x'},{l:'c',o:'c',p:'c'},{l:'v',o:'v',p:'v'},
+      {l:'b',o:'b',p:'b'},{l:'n',o:'n',p:'n'},{l:'m',o:'m',p:'m'},{l:',',o:',',p:','},
+      {l:'.',o:'.',p:'.'},{l:'/',o:'/',p:'/'},
+      {l:'Shift',o:'',p:'shift',w:'w22'}
+    ],
+    [
+      {l:'Space',o:' ',p:' ',w:'space'}
+    ]
   ];
-  for (let i = 0; i < 5; i++){
-    const o = document.createElement('div');
-    o.className = 'orb';
-    const size = 180 + Math.random() * 260;
-    o.style.width  = size + 'px';
-    o.style.height = size + 'px';
-    o.style.left   = (Math.random() * 100) + '%';
-    o.style.top    = (Math.random() * 100) + '%';
-    o.style.background = orbColors[i % orbColors.length];
-    o.style.animationDuration = (14 + Math.random() * 14) + 's';
-    o.style.animationDelay = (-Math.random() * 12) + 's';
-    layer.appendChild(o);
-  }
 
-  const count = window.innerWidth < 700 ? 14 : 24;
-  for (let i = 0; i < count; i++){
-    const w = document.createElement('div');
-    w.className = 'float-word';
-    w.textContent = KEYWORDS[Math.floor(Math.random() * KEYWORDS.length)];
-    w.style.left     = (Math.random() * 94) + '%';
-    w.style.top      = (Math.random() * 100) + '%';
-    w.style.fontSize = (13 + Math.random() * 30) + 'px';
-    w.style.setProperty('--rot', (Math.random() * 16 - 8).toFixed(1) + 'deg');
-    w.style.setProperty('--drift', (Math.random() * 120 - 60).toFixed(0) + 'px');
-    w.style.animationDuration = (20 + Math.random() * 26) + 's';
-    w.style.animationDelay    = (-Math.random() * 40) + 's';
-    layer.appendChild(w);
-  }
-})();
+  /* InScript Devanagari layout mapped onto QWERTY */
+  const HI_LAYOUT = [
+    [
+      {l:'१',o:'१',p:'1'},{l:'२',o:'२',p:'2'},{l:'३',o:'३',p:'3'},{l:'४',o:'४',p:'4'},
+      {l:'५',o:'५',p:'5'},{l:'६',o:'६',p:'6'},{l:'७',o:'७',p:'7'},{l:'८',o:'८',p:'8'},
+      {l:'९',o:'९',p:'9'},{l:'०',o:'०',p:'0'},{l:'-',o:'-',p:'-'},{l:'=',o:'=',p:'='},
+      {l:'⌫',o:'',p:'backspace',w:'w2'}
+    ],
+    [
+      {l:'Tab',o:'',p:'tab',w:'w15'},
+      {l:'ौ',o:'ौ',p:'q'},{l:'ै',o:'ै',p:'w'},{l:'ा',o:'ा',p:'e'},{l:'ी',o:'ी',p:'r'},
+      {l:'ू',o:'ू',p:'t'},{l:'ब',o:'ब',p:'y'},{l:'ह',o:'ह',p:'u'},{l:'ग',o:'ग',p:'i'},
+      {l:'द',o:'द',p:'o'},{l:'ज',o:'ज',p:'p'},{l:'ड',o:'ड',p:'['},{l:'़',o:'़',p:']'},
+      {l:'\\',o:'\\',p:'\\',w:'w15'}
+    ],
+    [
+      {l:'Caps',o:'',p:'capslock',w:'w18'},
+      {l:'ो',o:'ो',p:'a'},{l:'े',o:'े',p:'s'},{l:'्',o:'्',p:'d'},{l:'ि',o:'ि',p:'f'},
+      {l:'ु',o:'ु',p:'g'},{l:'प',o:'प',p:'h'},{l:'र',o:'र',p:'j'},{l:'क',o:'क',p:'k'},
+      {l:'त',o:'त',p:'l'},{l:'च',o:'च',p:';'},{l:'ट',o:'ट',p:"'"},
+      {l:'Enter',o:'',p:'enter',w:'w22'}
+    ],
+    [
+      {l:'Shift',o:'',p:'shift',w:'w22'},
+      {l:'ॉ',o:'ॉ',p:'z'},{l:'ं',o:'ं',p:'x'},{l:'म',o:'म',p:'c'},{l:'न',o:'न',p:'v'},
+      {l:'व',o:'व',p:'b'},{l:'ल',o:'ल',p:'n'},{l:'स',o:'स',p:'m'},{l:',',o:',',p:','},
+      {l:'.',o:'.',p:'.'},{l:'य',o:'य',p:'/'},
+      {l:'Shift',o:'',p:'shift',w:'w22'}
+    ],
+    [
+      {l:'Space',o:' ',p:' ',w:'space'}
+    ]
+  ];
 
-/* Pause the whole ambience while the user is actively typing */
-let idleTimer = null;
-function pauseAmbience(){
-  document.body.classList.add('typing');
-  clearTimeout(idleTimer);
-  idleTimer = setTimeout(() => document.body.classList.remove('typing'), 1400);
-}
+  /* Build reverse lookup: physical key -> Devanagari output */
+  const HI_MAP = {};
+  HI_LAYOUT.forEach(row => row.forEach(k => {
+    if (k.p && k.p.length === 1) HI_MAP[k.p.toLowerCase()] = k.o;
+  }));
 
-/* ================================================================
-   4. ANIMATED KEYBOARD — build
-   ================================================================ */
-const KEY_ROWS = [
-  [
-    {k:'`', l:'`'}, {k:'1'}, {k:'2'}, {k:'3'}, {k:'4'}, {k:'5'},
-    {k:'6'}, {k:'7'}, {k:'8'}, {k:'9'}, {k:'0'},
-    {k:'-', l:'−'}, {k:'=', l:'='},
-    {k:'backspace', l:'⌫ Backspace', w:2, mod:true}
-  ],
-  [
-    {k:'tab', l:'Tab', w:1.5, mod:true},
-    {k:'q'},{k:'w'},{k:'e'},{k:'r'},{k:'t'},{k:'y'},{k:'u'},{k:'i'},{k:'o'},{k:'p'},
-    {k:'[', l:'['}, {k:']', l:']'},
-    {k:'\\', l:'\\', w:1.5, mod:true}
-  ],
-  [
-    {k:'caps', l:'Caps', w:1.75, mod:true},
-    {k:'a'},{k:'s'},{k:'d'},{k:'f'},{k:'g'},{k:'h'},{k:'j'},{k:'k'},{k:'l'},
-    {k:';', l:';'}, {k:"'", l:"'"},
-    {k:'enter', l:'Enter ⏎', w:2.25, mod:true}
-  ],
-  [
-    {k:'shift', l:'Shift', w:2.25, mod:true},
-    {k:'z'},{k:'x'},{k:'c'},{k:'v'},{k:'b'},{k:'n'},{k:'m'},
-    {k:',', l:','}, {k:'.', l:'.'}, {k:'/', l:'/'},
-    {k:'shift', l:'Shift', w:2.75, mod:true}
-  ],
-  [
-    {k:'ctrl', l:'Ctrl', w:1.25, mod:true},
-    {k:'alt',  l:'Alt',  w:1.25, mod:true},
-    {k:'space', l:'',    w:10,   mod:true},
-    {k:'alt',  l:'Alt',  w:1.25, mod:true},
-    {k:'ctrl', l:'Ctrl', w:1.25, mod:true}
-  ]
-];
+  /* ----------------------------------------------------------
+     3. DOM REFERENCES
+     ---------------------------------------------------------- */
+  const bgLayer     = document.getElementById('bgLayer');
+  const keyboardEl  = document.getElementById('keyboard');
+  const textDisplay = document.getElementById('textDisplay');
+  const progressFill= document.getElementById('progressFill');
+  const modePill    = document.getElementById('modePill');
+  const statusPill  = document.getElementById('statusPill');
+  const kbTitle     = document.getElementById('kbTitle');
+  const kbHint      = document.getElementById('kbHint');
 
-(function buildKeyboard(){
-  KEY_ROWS.forEach(row => {
-    const rowEl = document.createElement('div');
-    rowEl.className = 'kb-row';
-    row.forEach(key => {
-      const el = document.createElement('div');
-      el.className = 'key' + (key.mod ? ' mod' : '');
-      el.dataset.key = key.k;
-      el.style.flexGrow = String(key.w || 1);
-      el.textContent = (key.l !== undefined) ? key.l : key.k.toUpperCase();
-      rowEl.appendChild(el);
-    });
-    keyboardEl.appendChild(rowEl);
-  });
-})();
+  const liveWpm  = document.getElementById('liveWpm');
+  const liveAcc  = document.getElementById('liveAcc');
+  const liveTime = document.getElementById('liveTime');
+  const liveErr  = document.getElementById('liveErr');
+  const barWpm   = document.getElementById('barWpm');
+  const barAcc   = document.getElementById('barAcc');
+  const barTime  = document.getElementById('barTime');
+  const barErr   = document.getElementById('barErr');
 
-function setKeyActive(id, on){
-  if (!id) return;
-  const keys = keyboardEl.querySelectorAll('.key');
-  for (let i = 0; i < keys.length; i++){
-    if (keys[i].dataset.key === id) keys[i].classList.toggle('active', on);
-  }
-}
+  const overlay    = document.getElementById('overlay');
+  const sbSub      = document.getElementById('sbSub');
+  const fWpm       = document.getElementById('fWpm');
+  const fAcc       = document.getElementById('fAcc');
+  const fRaw       = document.getElementById('fRaw');
+  const fCorrect   = document.getElementById('fCorrect');
+  const fWrong     = document.getElementById('fWrong');
+  const fTime      = document.getElementById('fTime');
+  const ringFg     = document.getElementById('ringFg');
+  const barSpeed   = document.getElementById('barSpeed');
+  const barAcc2    = document.getElementById('barAcc2');
+  const barCtrl    = document.getElementById('barCtrl');
+  const pctSpeed   = document.getElementById('pctSpeed');
+  const pctAcc     = document.getElementById('pctAcc');
+  const pctCtrl    = document.getElementById('pctCtrl');
 
-function keyIdFromEvent(e){
-  const k = e.key;
-  if (k === ' ')         return 'space';
-  if (k === 'Backspace') return 'backspace';
-  if (k === 'Enter')     return 'enter';
-  if (k === 'Tab')       return 'tab';
-  if (k === 'CapsLock')  return 'caps';
-  if (k === 'Shift')     return 'shift';
-  if (k === 'Control')   return 'ctrl';
-  if (k === 'Alt')       return 'alt';
-  if (k.length === 1)    return k.toLowerCase();
-  return null;
-}
+  const recentList = document.getElementById('recentList');
 
-/* ================================================================
-   5. TEST STATE
-   ================================================================ */
-let chars = [];       // every <span class="ch">
-let fullText = '';    // the whole text loaded so far
-let state = {};
-let fetchToken = 0;   // guards against out-of-order network replies
-
-function freshState(seconds){
-  return {
-    totalTime: seconds,
-    timeLeft: seconds,
-    index: 0,
-    result: [],        // index -> true / false / undefined
+  /* ----------------------------------------------------------
+     4. STATE
+     ---------------------------------------------------------- */
+  const state = {
+    lang: 'en',
+    duration: 300,          // seconds
+    target: '',
+    typed: [],
     started: false,
-    running: false,
     finished: false,
     startTime: 0,
+    endTime: 0,
     timerId: null,
-    samples: []
+    totalErrors: 0,
+    reverseMap: {}
   };
-}
 
-/* ================================================================
-   6. REMOTE PARAGRAPH FETCHING (with graceful fallback)
-   ================================================================ */
-function sanitize(text){
-  return String(text)
-    .replace(/[\u2018\u2019\u02BC]/g, "'")
-    .replace(/[\u201C\u201D]/g, '"')
-    .replace(/[\u2013\u2014]/g, '-')
-    .replace(/\u2026/g, '...')
-    .replace(/[^\x20-\x7E\n]/g, '')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
-
-function withTimeout(promise, ms){
-  return new Promise((resolve, reject) => {
-    const t = setTimeout(() => reject(new Error('timeout')), ms);
-    promise.then(
-      v => { clearTimeout(t); resolve(v); },
-      e => { clearTimeout(t); reject(e); }
-    );
-  });
-}
-
-async function tryFetchRemote(){
-  const sources = [
-    async () => {
-      const r = await fetch('https://api.quotable.io/random?maxLength=380');
-      if (!r.ok) throw new Error('bad');
-      const d = await r.json();
-      return d.content;
-    },
-    async () => {
-      const r = await fetch('https://dummyjson.com/quotes/random');
-      if (!r.ok) throw new Error('bad');
-      const d = await r.json();
-      return d.quote;
-    },
-    async () => {
-      const r = await fetch('https://baconipsum.com/api/?type=meat-and-filler&sentences=5&format=text');
-      if (!r.ok) throw new Error('bad');
-      return await r.text();
-    }
+  /* ----------------------------------------------------------
+     5. FLOATING BACKGROUND WORDS
+     ---------------------------------------------------------- */
+  const BG_WORDS = [
+    'typing','speed','wpm','accuracy','rhythm','flow','focus','keyboard',
+    'practice','precision','stroke','swift','steady','control','type',
+    'गति','टाइपिंग','शब्द','अभ्यास','सटीकता','कीबोर्ड','लय','ध्यान'
   ];
 
-  for (let i = 0; i < sources.length; i++){
-    try {
-      const raw = await withTimeout(sources[i](), 4500);
-      const clean = sanitize(raw);
-      if (clean && clean.length >= 90) return clean;
-    } catch (err) { /* try next source */ }
-  }
-  return null;
-}
-
-function pickLocal(){
-  return LOCAL_PARAGRAPHS[Math.floor(Math.random() * LOCAL_PARAGRAPHS.length)];
-}
-
-/* Load a local paragraph instantly, then swap in an online one
-   if it arrives before the user has started typing. */
-async function loadParagraph(){
-  const token = ++fetchToken;
-  loadText(pickLocal());
-
-  const remote = await tryFetchRemote();
-  if (remote && token === fetchToken && !state.started){
-    loadText(remote);
-  }
-}
-
-/* ================================================================
-   7. TEXT RENDERING
-   ================================================================ */
-function addWordEl(word, trailingSpace){
-  const wEl = document.createElement('span');
-  wEl.className = 'word';
-
-  for (let i = 0; i < word.length; i++){
-    const s = document.createElement('span');
-    s.className = 'ch';
-    s.textContent = word[i];
-    wEl.appendChild(s);
-    chars.push(s);
-  }
-  if (trailingSpace){
-    const s = document.createElement('span');
-    s.className = 'ch';
-    s.textContent = ' ';
-    wEl.appendChild(s);
-    chars.push(s);
-  }
-  textInner.appendChild(wEl);
-}
-
-function loadText(paragraph){
-  textInner.querySelectorAll('.word').forEach(n => n.remove());
-  chars = [];
-  fullText = paragraph;
-
-  const words = paragraph.split(' ');
-  words.forEach((w, i) => addWordEl(w, i < words.length - 1));
-
-  state.index = 0;
-  state.result = [];
-  textInner.style.transform = 'translateY(0px)';
-  updateCaret();
-}
-
-function appendText(paragraph){
-  const words = textInner.querySelectorAll('.word');
-  const last = words[words.length - 1];
-  if (last){
-    const s = document.createElement('span');
-    s.className = 'ch';
-    s.textContent = ' ';
-    last.appendChild(s);
-    chars.push(s);
-  }
-  const parts = paragraph.split(' ');
-  parts.forEach((w, i) => addWordEl(w, i < parts.length - 1));
-  fullText += ' ' + paragraph;
-}
-
-/* ================================================================
-   8. CARET + SCROLLING
-   ================================================================ */
-function readLineHeight(){
-  const v = getComputedStyle(document.documentElement).getPropertyValue('--lh');
-  return parseFloat(v) || 46;
-}
-
-function updateCaret(){
-  const el = chars[state.index];
-  if (!el){
-    caret.style.opacity = '0';
-    return;
-  }
-  caret.style.opacity = '1';
-
-  const LH = readLineHeight();
-  const caretH = parseFloat(
-    getComputedStyle(document.documentElement).getPropertyValue('--caret-h')
-  ) || 26;
-
-  const line = Math.max(0, Math.round(el.offsetTop / LH));
-  const x = el.offsetLeft;
-  const y = line * LH + Math.round((LH - caretH) / 2);
-
-  caret.style.transform = 'translate(' + x + 'px,' + y + 'px)';
-  textInner.style.transform = 'translateY(' + (-line * LH) + 'px)';
-}
-
-/* ================================================================
-   9. LIVE STATS
-   ================================================================ */
-function computeStats(){
-  let correct = 0, typed = 0;
-  for (let i = 0; i < state.result.length; i++){
-    if (state.result[i] === true){ correct++; typed++; }
-    else if (state.result[i] === false){ typed++; }
-  }
-
-  const elapsed = state.running
-      ? Math.max(0.6, (performance.now() - state.startTime) / 1000)
-      : Math.max(0.6, state.totalTime - state.timeLeft);
-
-  const minutes = elapsed / 60;
-  const wpm = Math.max(0, Math.round((correct / 5) / minutes));
-  const acc = typed > 0 ? Math.round((correct / typed) * 100) : 100;
-  const errors = typed - correct;
-
-  return { correct, typed, wpm, acc, errors, elapsed };
-}
-
-function refreshLiveStats(){
-  const s = computeStats();
-  statWpm.textContent = s.wpm;
-  statAcc.textContent = s.acc + '%';
-  statErr.textContent = s.errors;
-
-  const pct = (state.timeLeft / state.totalTime) * 100;
-  progressBar.style.width = pct + '%';
-  progressBar.classList.toggle('low', pct < 30);
-}
-
-function pulse(el){
-  el.classList.remove('pulse');
-  void el.offsetWidth;
-  el.classList.add('pulse');
-}
-
-/* ================================================================
-   10. TIMER
-   ================================================================ */
-function tick(){
-  const elapsed = (performance.now() - state.startTime) / 1000;
-  state.timeLeft = Math.max(0, state.totalTime - elapsed);
-
-  statTime.textContent = Math.ceil(state.timeLeft);
-
-  const sec = Math.floor(elapsed);
-  while (state.samples.length < sec && state.samples.length < state.totalTime){
-    state.samples.push(computeStats().wpm);
-  }
-
-  refreshLiveStats();
-
-  if (state.timeLeft <= 0) finishTest();
-}
-
-/* ================================================================
-   11. START / FINISH / RESET
-   ================================================================ */
-function startTest(){
-  state.started = true;
-  state.running = true;
-  state.startTime = performance.now();
-  state.timerId = setInterval(tick, 100);
-  hintEl.style.opacity = '0';
-  document.body.classList.add('typing');
-}
-
-function finishTest(){
-  if (state.finished) return;
-  state.finished = true;
-  state.running = false;
-  clearInterval(state.timerId);
-  document.body.classList.remove('typing');
-  showResults();
-}
-
-function resetTest(seconds){
-  clearInterval(state.timerId);
-  const total = (seconds !== undefined) ? seconds : state.totalTime;
-
-  state = freshState(total);
-  fetchToken++;                 // cancel any pending remote swap
-
-  loadParagraph();              // local now, online if it arrives fast
-
-  statTime.textContent = Math.ceil(total);
-  statWpm.textContent  = '0';
-  statAcc.textContent  = '100%';
-  statErr.textContent  = '0';
-  progressBar.style.width = '100%';
-  progressBar.classList.remove('low');
-  hintEl.style.opacity = '1';
-  hintEl.textContent = 'Start typing to begin the test…';
-  overlay.classList.remove('show');
-  document.body.classList.remove('typing');
-
-  setTimeout(updateCaret, 30);
-}
-
-/* ================================================================
-   12. TYPING HANDLER
-   ================================================================ */
-function handleTyping(e){
-  if (e.ctrlKey || e.metaKey || e.altKey) return;
-  if (state.finished) return;
-
-  pauseAmbience();
-
-  /* ---------- BACKSPACE ---------- */
-  if (e.key === 'Backspace'){
-    e.preventDefault();
-    if (state.index > 0){
-      state.index--;
-      state.result[state.index] = undefined;
-      const el = chars[state.index];
-      if (el) el.classList.remove('correct', 'wrong');
-      updateCaret();
-      refreshLiveStats();
+  function buildBackground() {
+    bgLayer.innerHTML = '';
+    const count = window.innerWidth < 700 ? 14 : 22;
+    for (let i = 0; i < count; i++) {
+      const el = document.createElement('span');
+      el.className = 'bg-word';
+      el.textContent = BG_WORDS[Math.floor(Math.random() * BG_WORDS.length)];
+      const size = 0.85 + Math.random() * 2.6;          // rem
+      el.style.fontSize = size + 'rem';
+      el.style.left = Math.random() * 96 + '%';
+      el.style.top  = Math.random() * 96 + '%';
+      el.style.setProperty('--rot', (Math.random() * 16 - 8).toFixed(2) + 'deg');
+      el.style.animationDuration = (14 + Math.random() * 20).toFixed(1) + 's';
+      el.style.animationDelay = (-Math.random() * 20).toFixed(1) + 's';
+      el.style.opacity = (0.08 + Math.random() * 0.12).toFixed(3);
+      bgLayer.appendChild(el);
     }
-    return;
   }
 
-  /* ---------- PRINTABLE CHARACTERS ---------- */
-  if (e.key.length !== 1) return;
-  e.preventDefault();
-
-  if (!state.started) startTest();
-
-  // keep a healthy buffer of text ahead of the typist
-  if (state.index >= chars.length - 60){
-    appendText(pickLocal());
+  /* Pause background features while the user is actively typing */
+  let typingFreezeTimer = null;
+  function markTyping() {
+    document.body.classList.add('typing');
+    clearTimeout(typingFreezeTimer);
+    typingFreezeTimer = setTimeout(() => {
+      document.body.classList.remove('typing');
+    }, 1400);
   }
 
-  const el = chars[state.index];
-  if (!el) return;
+  /* ----------------------------------------------------------
+     6. KEYBOARD RENDERING
+     ---------------------------------------------------------- */
+  function buildKeyboard() {
+    const layout = state.lang === 'en' ? EN_LAYOUT : HI_LAYOUT;
+    keyboardEl.innerHTML = '';
 
-  const correct = e.key === el.textContent;
-  state.result[state.index] = correct;
+    layout.forEach(row => {
+      const rowEl = document.createElement('div');
+      rowEl.className = 'kb-row';
 
-  el.classList.remove('correct', 'wrong');
-  el.classList.add(correct ? 'correct' : 'wrong');
+      row.forEach(k => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'key' + (k.w ? ' ' + k.w : '');
+        btn.dataset.phys = k.p;
+        btn.dataset.out  = k.o;
 
-  if (correct) pulse(statWpm);
+        const main = document.createElement('span');
+        main.textContent = k.l;
+        btn.appendChild(main);
 
-  state.index++;
-  updateCaret();
-  refreshLiveStats();
-}
+        /* small physical-key hint under Devanagari glyphs */
+        if (state.lang === 'hi' && k.p && k.p.length === 1 && /[a-z]/i.test(k.p)) {
+          const sub = document.createElement('span');
+          sub.className = 'sub';
+          sub.textContent = k.p.toUpperCase();
+          btn.appendChild(sub);
+        }
 
-document.addEventListener('keydown', function(e){
-  const id = keyIdFromEvent(e);
-  setKeyActive(id, true);
+        btn.addEventListener('mousedown', e => e.preventDefault());
+        btn.addEventListener('touchstart', e => { e.preventDefault(); }, {passive:false});
+        btn.addEventListener('click', e => {
+          e.preventDefault();
+          handleVirtualKey(k);
+        });
 
-  if (overlay.classList.contains('show')){
-    if (e.key === 'Escape') closeResults();
-    return;
-  }
-  handleTyping(e);
-});
+        rowEl.appendChild(btn);
+      });
 
-document.addEventListener('keyup', function(e){
-  setKeyActive(keyIdFromEvent(e), false);
-});
-
-/* stop the page from scrolling when space is pressed */
-window.addEventListener('keydown', function(e){
-  if (e.key === ' ' && e.target === document.body) e.preventDefault();
-}, { passive:false });
-
-/* ================================================================
-   13. RESULT SCOREBOARD (animated)
-   ================================================================ */
-function animateNumber(el, to, duration, suffix){
-  suffix = suffix || '';
-  const start = performance.now();
-  function frame(t){
-    const p = Math.min(1, (t - start) / duration);
-    const eased = 1 - Math.pow(1 - p, 3);
-    el.textContent = Math.round(to * eased) + suffix;
-    if (p < 1) requestAnimationFrame(frame);
-    else el.textContent = to + suffix;
-  }
-  requestAnimationFrame(frame);
-}
-
-function showResults(){
-  const s = computeStats();
-  const duration = Math.max(1, Math.round(state.totalTime - state.timeLeft));
-
-  animateNumber(rWpm, s.wpm, 1100);
-
-  setTimeout(() => animateNumber(rAcc,   s.acc,     800, '%'), 200);
-  setTimeout(() => animateNumber(rErr,   s.errors,  700),      330);
-  setTimeout(() => animateNumber(rChars, s.correct, 900),      450);
-  setTimeout(() => animateNumber(rTime,  duration,  800, 's'), 570);
-
-  let msg = 'Keep going — rhythm comes with practice.';
-  if (s.wpm >= 20 && s.wpm < 40)  msg = 'Solid start. Focus on accuracy before speed.';
-  if (s.wpm >= 40 && s.wpm < 60)  msg = 'Good pace — you are above average!';
-  if (s.wpm >= 60 && s.wpm < 80)  msg = 'Fast and steady. Nicely done.';
-  if (s.wpm >= 80 && s.wpm < 100) msg = 'Excellent! That is professional speed.';
-  if (s.wpm >= 100)               msg = 'Blazing fast. Absolutely impressive!';
-  if (s.acc < 85 && s.typed > 20) msg = 'Slow down a little — accuracy is what counts.';
-  verdict.textContent = msg;
-
-  /* animated bar chart of WPM over time */
-  chart.innerHTML = '';
-  const samples = state.samples.length ? state.samples.slice() : [s.wpm];
-  const maxVal = Math.max.apply(null, samples.concat([1]));
-
-  samples.forEach((v, i) => {
-    const bar = document.createElement('div');
-    bar.className = 'chart-bar';
-    bar.style.height = '0%';
-    bar.title = v + ' WPM';
-    chart.appendChild(bar);
-    setTimeout(() => {
-      bar.style.height = Math.max(6, (v / maxVal) * 100) + '%';
-    }, 120 + i * 55);
-  });
-
-  saveBest(s.wpm);
-  overlay.classList.add('show');
-}
-
-function closeResults(){
-  overlay.classList.remove('show');
-}
-
-/* ================================================================
-   14. BEST SCORE (localStorage)
-   ================================================================ */
-function loadBest(){
-  try {
-    const v = localStorage.getItem('typeflow_best');
-    return v ? parseInt(v, 10) : 0;
-  } catch (err){ return 0; }
-}
-
-function saveBest(wpm){
-  try {
-    if (wpm > loadBest()) localStorage.setItem('typeflow_best', String(wpm));
-  } catch (err){ /* storage unavailable */ }
-  renderBest();
-}
-
-function renderBest(){
-  const best = loadBest();
-  bestBadge.innerHTML = 'Best&nbsp;·&nbsp;<b>' + (best || '—') + '</b> WPM';
-}
-
-/* ================================================================
-   15. TIME SELECTOR BUTTONS
-   ================================================================ */
-(function buildTimeButtons(){
-  TIME_OPTIONS.forEach((opt, i) => {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'time-btn' + (i === 0 ? ' active' : '');
-    btn.textContent = opt.label;
-    btn.dataset.seconds = opt.seconds;
-
-    btn.addEventListener('click', () => {
-      timesEl.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      resetTest(opt.seconds);
+      keyboardEl.appendChild(rowEl);
     });
 
-    timesEl.appendChild(btn);
+    buildReverseMap();
+    kbTitle.textContent = state.lang === 'en' ? 'English Keyboard' : 'हिन्दी कीबोर्ड (InScript)';
+    kbHint.textContent  = state.lang === 'en'
+      ? 'Click a key or use your physical keyboard'
+      : 'क्लिक करें या भौतिक कीबोर्ड का उपयोग करें';
+  }
+
+  /* Map an output character back to its physical key (for "next key" glow) */
+  function buildReverseMap() {
+    state.reverseMap = {};
+    const layout = state.lang === 'en' ? EN_LAYOUT : HI_LAYOUT;
+    layout.forEach(row => row.forEach(k => {
+      if (!k.p || k.p.length !== 1) return;
+      const out = k.o;
+      if (out && out.length) {
+        state.reverseMap[out] = k.p;
+        state.reverseMap[out.toLowerCase()] = k.p;
+      }
+    }));
+  }
+
+  function pressKey(physKey, flashOnly) {
+    if (!physKey) return;
+    const keys = keyboardEl.querySelectorAll('.key');
+    keys.forEach(k => {
+      if (k.dataset.phys === physKey) {
+        k.classList.add('active');
+        setTimeout(() => k.classList.remove('active'), 130);
+      }
+    });
+  }
+
+  function highlightNextKey() {
+    const keys = keyboardEl.querySelectorAll('.key');
+    keys.forEach(k => k.classList.remove('next'));
+    if (state.finished) return;
+
+    const idx = state.typed.length;
+    if (idx >= state.target.length) return;
+
+    const ch = state.target[idx];
+    let phys = null;
+
+    if (state.lang === 'en') {
+      phys = ch.toLowerCase();
+      if (!state.reverseMap[phys] && !state.reverseMap[ch]) return;
+    } else {
+      phys = state.reverseMap[ch];
+      if (!phys) return;
+    }
+
+    keys.forEach(k => {
+      if (k.dataset.phys === phys) k.classList.add('next');
+    });
+  }
+
+  /* ----------------------------------------------------------
+     7. TEXT + SESSION SETUP
+     ---------------------------------------------------------- */
+  function pickParagraph() {
+    const pool = PARAGRAPHS[state.lang];
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+
+  function newSession(keepLang) {
+    clearInterval(state.timerId);
+
+    state.target   = pickParagraph();
+    state.typed    = [];
+    state.started  = false;
+    state.finished = false;
+    state.startTime= 0;
+    state.endTime  = 0;
+    state.timerId  = null;
+    state.totalErrors = 0;
+
+    overlay.classList.remove('show');
+    resetRing();
+
+    renderText();
+    updateLiveStats(0);
+    highlightNextKey();
+
+    statusPill.textContent = 'Ready';
+    updateModePill();
+
+    progressFill.style.width = '0%';
+    liveTime.textContent = fmtTime(state.duration);
+    barTime.style.width = '100%';
+  }
+
+  function updateModePill() {
+    const mins = Math.round(state.duration / 60);
+    modePill.textContent =
+      (state.lang === 'en' ? 'English' : 'हिन्दी') + ' · ' + mins + ' min';
+  }
+
+  /* ----------------------------------------------------------
+     8. RENDERING THE TEXT
+     ---------------------------------------------------------- */
+  function renderText() {
+    const frag = document.createDocumentFragment();
+    const t = state.target;
+
+    for (let i = 0; i < t.length; i++) {
+      const span = document.createElement('span');
+      span.className = 'ch';
+      if (t[i] === ' ') span.classList.add('space');
+
+      if (i < state.typed.length) {
+        span.classList.add(state.typed[i] === t[i] ? 'ok' : 'bad');
+      } else if (i === state.typed.length) {
+        span.classList.add('cur');
+      }
+
+      span.textContent = t[i];
+      frag.appendChild(span);
+    }
+
+    textDisplay.innerHTML = '';
+    textDisplay.appendChild(frag);
+    scrollToCaret();
+  }
+
+  function scrollToCaret() {
+    const cur = textDisplay.querySelector('.ch.cur');
+    if (!cur) return;
+    const target = cur.offsetTop - textDisplay.clientHeight / 2 + 26;
+    textDisplay.scrollTo({
+      top: Math.max(0, target),
+      behavior: 'smooth'
+    });
+  }
+
+  /* ----------------------------------------------------------
+     9. INPUT HANDLING
+     ---------------------------------------------------------- */
+  function handleVirtualKey(k) {
+    markTyping();
+    if (k.p === 'backspace') { handleBackspace(); return; }
+    if (k.p === 'tab' || k.p === 'capslock' || k.p === 'shift' ||
+        k.p === 'enter' || k.p === '') { return; }
+    pressKey(k.p);
+    handleChar(k.o);
+  }
+
+  function handleChar(ch) {
+    if (state.finished) return;
+    if (!ch) return;
+
+    if (!state.started) startTimer();
+    if (state.typed.length >= state.target.length) return;
+
+    const expected = state.target[state.typed.length];
+    if (ch !== expected) state.totalErrors++;
+
+    state.typed.push(ch);
+    renderText();
+    updateLiveStats(0);
+    highlightNextKey();
+
+    if (state.typed.length >= state.target.length) finishSession();
+  }
+
+  function handleBackspace() {
+    if (state.finished || state.typed.length === 0) return;
+    state.typed.pop();
+    renderText();
+    updateLiveStats(0);
+    highlightNextKey();
+  }
+
+  /* Physical keyboard */
+  document.addEventListener('keydown', e => {
+    const tag = (e.target.tagName || '').toLowerCase();
+    if (tag === 'button' || tag === 'input' || tag === 'textarea' || tag === 'select') return;
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+
+    /* Restart shortcut */
+    if (e.key === 'Escape') { newSession(); return; }
+
+    if (e.key === 'Backspace') {
+      e.preventDefault();
+      markTyping();
+      pressKey('backspace');
+      handleBackspace();
+      return;
+    }
+
+    if (e.key === ' ') {
+      e.preventDefault();
+      markTyping();
+      pressKey(' ');
+      handleChar(' ');
+      return;
+    }
+
+    if (e.key === 'Enter') { e.preventDefault(); pressKey('enter'); return; }
+    if (e.key === 'Tab')   { e.preventDefault(); pressKey('tab'); return; }
+    if (e.key === 'Shift') { pressKey('shift'); return; }
+    if (e.key === 'CapsLock') { pressKey('capslock'); return; }
+    if (e.key.length !== 1) return;
+
+    markTyping();
+
+    let ch;
+    if (state.lang === 'en') {
+      ch = e.key;
+    } else {
+      ch = HI_MAP[e.key.toLowerCase()];
+      if (ch === undefined) return;
+    }
+
+    e.preventDefault();
+    pressKey(e.key.toLowerCase());
+    handleChar(ch);
   });
+
+  /* Keep focus pleasant */
+  textDisplay.addEventListener('click', () => textDisplay.focus());
+
+  /* ----------------------------------------------------------
+     10. TIMER + LIVE STATS
+     ---------------------------------------------------------- */
+  function startTimer() {
+    state.started  = true;
+    state.startTime = Date.now();
+    state.endTime   = state.startTime + state.duration * 1000;
+    statusPill.textContent = 'Typing…';
+
+    state.timerId = setInterval(() => {
+      const remain = Math.max(0, state.endTime - Date.now());
+      updateLiveStats(remain);
+      if (remain <= 0) finishSession();
+    }, 100);
+  }
+
+  function countCorrect() {
+    let c = 0;
+    const n = Math.min(state.typed.length, state.target.length);
+    for (let i = 0; i < n; i++) if (state.typed[i] === state.target[i]) c++;
+    return c;
+  }
+
+  function elapsedMinutes() {
+    if (!state.started) return 0;
+    const ms = state.finished
+      ? (state.endTime - state.startTime)
+      : (Date.now() - state.startTime);
+    return Math.max(ms / 60000, 1 / 600);
+  }
+
+  function updateLiveStats(remainMs) {
+    const elapsed = elapsedMinutes();
+    const correct = countCorrect();
+    const typedCount = state.typed.length;
+
+    const wpm = elapsed > 0 ? Math.round((correct / 5) / elapsed) : 0;
+    const acc = typedCount > 0 ? (correct / typedCount) * 100 : 100;
+
+    /* remaining time */
+    let remainSec;
+    if (!state.started) {
+      remainSec = state.duration;
+    } else {
+      remainSec = Math.max(0, Math.round((state.endTime - Date.now()) / 1000));
+    }
+
+    liveWpm.textContent  = wpm;
+    liveAcc.textContent  = acc.toFixed(0);
+    liveTime.textContent = fmtTime(remainSec);
+    liveErr.textContent  = state.totalErrors;
+
+    barWpm.style.width  = Math.min(100, (wpm / 120) * 100) + '%';
+    barAcc.style.width  = Math.min(100, acc) + '%';
+    barTime.style.width = (remainSec / state.duration) * 100 + '%';
+    barErr.style.width  = Math.min(100, state.totalErrors * 4) + '%';
+
+    /* progress through the passage */
+    const prog = state.target.length
+      ? (state.typed.length / state.target.length) * 100
+      : 0;
+    progressFill.style.width = Math.min(100, prog) + '%';
+  }
+
+  function fmtTime(sec) {
+    sec = Math.max(0, Math.round(sec));
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    return m + ':' + (s < 10 ? '0' : '') + s;
+  }
+
+  /* ----------------------------------------------------------
+     11. FINISH + ANIMATED SCOREBOARD
+     ---------------------------------------------------------- */
+  function finishSession() {
+    if (state.finished) return;
+    state.finished = true;
+    clearInterval(state.timerId);
+    statusPill.textContent = 'Finished';
+
+    const elapsed = Math.max((Date.now() - state.startTime) / 60000, 1 / 600);
+    const correct = countCorrect();
+    const typedCount = state.typed.length;
+    const wrong = typedCount - correct;
+
+    const wpm = Math.round((correct / 5) / elapsed);
+    const raw = Math.round((typedCount / 5) / elapsed);
+    const acc = typedCount > 0 ? (correct / typedCount) * 100 : 100;
+
+    const usedSec = Math.min(
+      state.duration,
+      Math.max(1, Math.round((Date.now() - state.startTime) / 1000))
+    );
+
+    showScoreboard({ wpm, raw, acc, correct, wrong, usedSec });
+
+    saveScore({ wpm, acc: Math.round(acc), lang: state.lang, dur: state.duration });
+  }
+
+  function resetRing() {
+    ringFg.style.transition = 'none';
+    ringFg.style.strokeDashoffset = '326.7';
+    /* force reflow */
+    void ringFg.getBoundingClientRect();
+    ringFg.style.transition = '';
+  }
+
+  function showScoreboard(res) {
+    const mins = Math.round(state.duration / 60);
+    sbSub.textContent =
+      (state.lang === 'en' ? 'English' : 'हिन्दी') + ' · ' + mins + ' minute' + (mins > 1 ? 's' : '');
+
+    overlay.classList.add('show');
+
+    /* animated counters */
+    animateNumber(fWpm, res.wpm, 1400, 0);
+    animateNumber(fAcc, res.acc, 1400, 0);
+    animateNumber(fRaw, res.raw, 1400, 0);
+    animateNumber(fCorrect, res.correct, 1200, 0);
+    animateNumber(fWrong, res.wrong, 1200, 0);
+    fTime.textContent = fmtTime(res.usedSec);
+
+    /* accuracy ring */
+    const circ = 2 * Math.PI * 52;              // ≈ 326.7
+    const offset = circ - (Math.min(100, res.acc) / 100) * circ;
+    setTimeout(() => {
+      ringFg.style.strokeDashoffset = offset.toFixed(2);
+    }, 180);
+
+    /* animated bars */
+    const speedPct = Math.min(100, Math.round((res.wpm / 120) * 100));
+    const accPct   = Math.min(100, Math.round(res.acc));
+    const ctrlPct  = Math.max(0, Math.min(100,
+        Math.round(accPct * 0.6 + (100 - Math.min(100, res.wrong * 2)) * 0.4)));
+
+    barSpeed.style.width = '0%';
+    barAcc2.style.width  = '0%';
+    barCtrl.style.width  = '0%';
+    pctSpeed.textContent = '0%';
+    pctAcc.textContent   = '0%';
+    pctCtrl.textContent  = '0%';
+
+    setTimeout(() => {
+      barSpeed.style.width = speedPct + '%';
+      barAcc2.style.width  = accPct + '%';
+      barCtrl.style.width  = ctrlPct + '%';
+      animateNumber(pctSpeed, speedPct, 1300, 0, '%');
+      animateNumber(pctAcc,   accPct,   1300, 0, '%');
+      animateNumber(pctCtrl,  ctrlPct,  1300, 0, '%');
+    }, 260);
+  }
+
+  function animateNumber(el, target, duration, decimals, suffix) {
+    suffix = suffix || '';
+    const start = performance.now();
+    const from = 0;
+    function step(now) {
+      const p = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - p, 3);
+      const val = from + (target - from) * eased;
+      el.textContent = val.toFixed(decimals) + suffix;
+      if (p < 1) requestAnimationFrame(step);
+      else el.textContent = target.toFixed(decimals) + suffix;
+    }
+    requestAnimationFrame(step);
+  }
+
+  /* ----------------------------------------------------------
+     12. RECENT SCORES (localStorage)
+     ---------------------------------------------------------- */
+  const SCORE_KEY = 'typeflow_scores_v1';
+
+  function loadScores() {
+    try {
+      return JSON.parse(localStorage.getItem(SCORE_KEY)) || [];
+    } catch (e) { return []; }
+  }
+
+  function saveScore(entry) {
+    const list = loadScores();
+    list.push(Object.assign({ t: Date.now() }, entry));
+    list.sort((a, b) => b.wpm - a.wpm);
+    const trimmed = list.slice(0, 8);
+    try { localStorage.setItem(SCORE_KEY, JSON.stringify(trimmed)); } catch (e) {}
+    renderRecent(trimmed);
+  }
+
+  function renderRecent(list) {
+    if (!list || !list.length) {
+      recentList.innerHTML =
+        '<div class="empty-msg">No sessions yet — complete a test to fill the board.</div>';
+      return;
+    }
+    recentList.innerHTML = '';
+    list.forEach((s, i) => {
+      const row = document.createElement('div');
+      row.className = 'recent-row';
+      row.style.animationDelay = (i * 0.07) + 's';
+
+      const mins = Math.round(s.dur / 60);
+      const langTxt = s.lang === 'en' ? 'EN' : 'हि';
+      const d = new Date(s.t);
+      const dateTxt = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+
+      row.innerHTML =
+        '<span class="rank">' + (i + 1) + '</span>' +
+        '<span class="wpm">' + s.wpm + ' <span style="font-size:.7rem;opacity:.7">WPM</span></span>' +
+        '<span class="acc">' + s.acc + '%</span>' +
+        '<span class="meta hide-sm">' + langTxt + ' · ' + mins + 'm</span>' +
+        '<span class="meta hide-sm">' + dateTxt + '</span>';
+
+      recentList.appendChild(row);
+    });
+  }
+
+  /* ----------------------------------------------------------
+     13. UI WIRING
+     ---------------------------------------------------------- */
+  /* Duration buttons */
+  document.getElementById('timeBtns').addEventListener('click', e => {
+    const btn = e.target.closest('.tbtn');
+    if (!btn) return;
+    document.querySelectorAll('.tbtn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    state.duration = parseInt(btn.dataset.time, 10);
+    newSession();
+  });
+
+  /* Language toggle */
+  document.getElementById('langToggle').addEventListener('click', e => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    document.querySelectorAll('#langToggle button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    state.lang = btn.dataset.lang;
+    buildKeyboard();
+    newSession();
+  });
+
+  /* New text buttons */
+  document.getElementById('newTextBtnTop').addEventListener('click', () => newSession());
+  document.getElementById('newTextBtn').addEventListener('click', () => {
+    overlay.classList.remove('show');
+    newSession();
+  });
+
+  /* Try again */
+  document.getElementById('againBtn').addEventListener('click', () => {
+    overlay.classList.remove('show');
+    newSession();
+  });
+
+  /* Close overlay on background click */
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) overlay.classList.remove('show');
+  });
+
+  /* Rebuild background on resize (keep it balanced) */
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(buildBackground, 350);
+  });
+
+  /* ----------------------------------------------------------
+     14. BOOT
+     ---------------------------------------------------------- */
+  function boot() {
+    buildBackground();
+    buildKeyboard();
+    renderRecent(loadScores());
+    state.target = pickParagraph();
+    state.typed = [];
+    renderText();
+    updateModePill();
+    updateLiveStats(0);
+    highlightNextKey();
+    liveTime.textContent = fmtTime(state.duration);
+  }
+
+  boot();
+
 })();
-
-/* ================================================================
-   16. UI EVENTS
-   ================================================================ */
-document.getElementById('restartBtn').addEventListener('click', () => {
-  resetTest(state.totalTime);
-});
-
-document.getElementById('againBtn').addEventListener('click', () => {
-  resetTest(state.totalTime);
-});
-
-document.getElementById('closeBtn').addEventListener('click', closeResults);
-
-overlay.addEventListener('click', (e) => {
-  if (e.target === overlay) closeResults();
-});
-
-viewport.addEventListener('click', () => {
-  caret.style.animation = 'none';
-  void caret.offsetWidth;
-  caret.style.animation = '';
-});
-
-window.addEventListener('resize', updateCaret);
-
-/* ================================================================
-   17. BOOT
-   ================================================================ */
-renderBest();
-state = freshState(TIME_OPTIONS[0].seconds);
-loadParagraph();
-statTime.textContent = TIME_OPTIONS[0].seconds;
-refreshLiveStats();
-
-if (document.fonts && document.fonts.ready){
-  document.fonts.ready.then(updateCaret);
-}
-window.addEventListener('load', () => setTimeout(updateCaret, 60));
 </script>
 </body>
 </html>
